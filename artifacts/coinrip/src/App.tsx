@@ -3,6 +3,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Rip from "@/pages/Rip";
 import Collection from "@/pages/Collection";
+import About from "@/pages/About";
 import { Layout } from "@/components/layout/Layout";
 
 function Router() {
@@ -12,6 +13,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/rip" component={Rip} />
         <Route path="/collection" component={Collection} />
+        <Route path="/about" component={About} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
