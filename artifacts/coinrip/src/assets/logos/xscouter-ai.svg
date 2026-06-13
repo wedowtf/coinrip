@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="xs" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#BE123C"/>
+      <stop offset="100%" stop-color="#9F1239"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#xs)"/>
+  <!-- Magnifying glass -->
+  <circle cx="44" cy="44" r="22" fill="none" stroke="white" stroke-width="5" opacity="0.9"/>
+  <circle cx="44" cy="44" r="13" fill="white" opacity="0.15"/>
+  <!-- X inside -->
+  <line x1="37" y1="37" x2="51" y2="51" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+  <line x1="51" y1="37" x2="37" y2="51" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+  <!-- Handle -->
+  <line x1="61" y1="61" x2="80" y2="80" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.9"/>
+  <!-- Score badge -->
+  <circle cx="76" cy="28" r="12" fill="#F43F5E"/>
+  <text x="76" y="33" font-family="Arial Black,sans-serif" font-size="12" font-weight="900" fill="white" text-anchor="middle">AI</text>
+</svg>
