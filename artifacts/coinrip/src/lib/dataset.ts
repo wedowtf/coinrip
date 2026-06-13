@@ -1,3 +1,5 @@
+import { LOGO_MAP } from '@/lib/logos';
+
 export type Tier = 'SPARK' | 'FLARE' | 'NOVA' | 'PULSAR' | 'SINGULARITY';
 
 export interface Coin {
@@ -6,48 +8,44 @@ export interface Coin {
   marketCap: number;
   tier: Tier;
   logoUrl: string;
-  domain: string;
   category: string;
 }
 
-const getFavicon = (domain: string) =>
-  `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-
 const RAW_COINS = [
-  { name: "Alpie", tagline: "An AI workspace that thinks with you", marketCap: 1200000, domain: "alpie.ai", category: "AI Tools" },
-  { name: "Orynth", tagline: "Where products find their first users", marketCap: 384800, domain: "orynth.dev", category: "Marketplace" },
-  { name: "Moonshift", tagline: "Type your idea. Wake up to a deployed app.", marketCap: 141800, domain: "moonshift.io", category: "Dev Tools" },
-  { name: "MangaNow", tagline: "Transform text and videos into manga", marketCap: 75700, domain: "manganow.io", category: "Creative" },
-  { name: "MagTapp", tagline: "Browser, PDF, and productivity tools", marketCap: 40400, domain: "magtapp.com", category: "Productivity" },
-  { name: "SuzuPay", tagline: "QR code payments, redefined", marketCap: 22000, domain: "suzupay.com", category: "Fintech" },
-  { name: "Avocado AI", tagline: "Ship client-ready ads instantly", marketCap: 19700, domain: "avocadoai.co", category: "Marketing" },
-  { name: "AVATAR UI", tagline: "Next-gen interface design system", marketCap: 14600, domain: "avatarui.xyz", category: "Design" },
-  { name: "Brain", tagline: "Infrastructure for AI agents", marketCap: 11400, domain: "brain.ai", category: "AI Infra" },
-  { name: "Relaxsync", tagline: "20-sided roll/rotate meditation tool", marketCap: 10600, domain: "relaxsync.com", category: "Wellness" },
-  { name: "Ordina", tagline: "Your 24/7 AI secretary", marketCap: 10300, domain: "ordina.ai", category: "AI Tools" },
-  { name: "Degen Terminal", tagline: "AI-powered trading terminal", marketCap: 9200, domain: "degenterminal.xyz", category: "Fintech" },
-  { name: "inspireXgrowth", tagline: "AI growth tools for founders", marketCap: 9000, domain: "inspirexgrowth.com", category: "Growth" },
-  { name: "Aniverse", tagline: "3D x AI next-gen experience", marketCap: 7600, domain: "aniverse.gg", category: "Creative" },
-  { name: "RedCircle", tagline: "Bringing Reddit posts to crypto", marketCap: 7000, domain: "redcircle.com", category: "Social" },
-  { name: "FeedRun", tagline: "Feedback forms that actually convert", marketCap: 6400, domain: "feedrun.io", category: "Productivity" },
-  { name: "Whitespace", tagline: "Personalized meditation, anywhere", marketCap: 6400, domain: "whitespace.fyi", category: "Wellness" },
-  { name: "XScouter AI", tagline: "Don't trust. Verify. Score.", marketCap: 6300, domain: "xscouter.com", category: "AI Tools" },
-  { name: "Cofounder Hunt", tagline: "Find your co-founder today", marketCap: 6200, domain: "cofounderhunt.co", category: "Community" },
-  { name: "lilAgents", tagline: "Agents you can hire by the task", marketCap: 6200, domain: "lilagents.com", category: "AI Infra" },
+  { name: 'Alpie',          tagline: 'An AI workspace that thinks with you',         marketCap: 1200000, category: 'AI Tools' },
+  { name: 'Orynth',         tagline: 'Where products find their first users',         marketCap: 384800,  category: 'Marketplace' },
+  { name: 'Moonshift',      tagline: 'Type your idea. Wake up to a deployed app.',    marketCap: 141800,  category: 'Dev Tools' },
+  { name: 'MangaNow',       tagline: 'Transform text and videos into manga',          marketCap: 75700,   category: 'Creative' },
+  { name: 'MagTapp',        tagline: 'Browser, PDF, and productivity tools',          marketCap: 40400,   category: 'Productivity' },
+  { name: 'SuzuPay',        tagline: 'QR code payments, redefined',                  marketCap: 22000,   category: 'Fintech' },
+  { name: 'Avocado AI',     tagline: 'Ship client-ready ads instantly',               marketCap: 19700,   category: 'Marketing' },
+  { name: 'AVATAR UI',      tagline: 'Next-gen interface design system',              marketCap: 14600,   category: 'Design' },
+  { name: 'Brain',          tagline: 'Infrastructure for AI agents',                  marketCap: 11400,   category: 'AI Infra' },
+  { name: 'Relaxsync',      tagline: '20-sided roll/rotate meditation tool',          marketCap: 10600,   category: 'Wellness' },
+  { name: 'Ordina',         tagline: 'Your 24/7 AI secretary',                        marketCap: 10300,   category: 'AI Tools' },
+  { name: 'Degen Terminal', tagline: 'AI-powered trading terminal',                   marketCap: 9200,    category: 'Fintech' },
+  { name: 'inspireXgrowth', tagline: 'AI growth tools for founders',                  marketCap: 9000,    category: 'Growth' },
+  { name: 'Aniverse',       tagline: '3D x AI next-gen experience',                   marketCap: 7600,    category: 'Creative' },
+  { name: 'RedCircle',      tagline: 'Bringing Reddit posts to crypto',               marketCap: 7000,    category: 'Social' },
+  { name: 'FeedRun',        tagline: 'Feedback forms that actually convert',          marketCap: 6400,    category: 'Productivity' },
+  { name: 'Whitespace',     tagline: 'Personalized meditation, anywhere',             marketCap: 6400,    category: 'Wellness' },
+  { name: 'XScouter AI',    tagline: "Don't trust. Verify. Score.",                   marketCap: 6300,    category: 'AI Tools' },
+  { name: 'Cofounder Hunt', tagline: 'Find your co-founder today',                    marketCap: 6200,    category: 'Community' },
+  { name: 'lilAgents',      tagline: 'Agents you can hire by the task',               marketCap: 6200,    category: 'AI Infra' },
 ];
 
 export const getTier = (marketCap: number): Tier => {
   if (marketCap > 100000) return 'SINGULARITY';
-  if (marketCap >= 20000) return 'PULSAR';
-  if (marketCap >= 10000) return 'NOVA';
-  if (marketCap >= 7000) return 'FLARE';
+  if (marketCap >= 20000)  return 'PULSAR';
+  if (marketCap >= 10000)  return 'NOVA';
+  if (marketCap >= 7000)   return 'FLARE';
   return 'SPARK';
 };
 
 export const COINS: Coin[] = RAW_COINS.map(c => ({
   ...c,
   tier: getTier(c.marketCap),
-  logoUrl: getFavicon(c.domain),
+  logoUrl: LOGO_MAP[c.name] ?? '',
 }));
 
 export type PackId = 'daily' | 'mystery' | 'starter' | 'blazer' | 'cosmic' | 'galaxy';
@@ -137,22 +135,16 @@ export const PACKS: PackDef[] = [
 const getWeightedCoin = (weights: Record<Tier, number>): Coin => {
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
   let random = Math.random() * totalWeight;
-
   let selectedTier: Tier = 'SPARK';
   for (const [tier, weight] of Object.entries(weights) as [Tier, number][]) {
     random -= weight;
-    if (random <= 0) {
-      selectedTier = tier;
-      break;
-    }
+    if (random <= 0) { selectedTier = tier; break; }
   }
-
   const tierCoins = COINS.filter(c => c.tier === selectedTier);
   if (tierCoins.length === 0) {
-    const allTiers: Tier[] = ['SINGULARITY', 'PULSAR', 'NOVA', 'FLARE', 'SPARK'];
-    for (const t of allTiers) {
-      const fallback = COINS.filter(c => c.tier === t);
-      if (fallback.length > 0) return fallback[Math.floor(Math.random() * fallback.length)];
+    for (const t of ['SINGULARITY', 'PULSAR', 'NOVA', 'FLARE', 'SPARK'] as Tier[]) {
+      const fb = COINS.filter(c => c.tier === t);
+      if (fb.length) return fb[Math.floor(Math.random() * fb.length)];
     }
     return COINS[0];
   }
