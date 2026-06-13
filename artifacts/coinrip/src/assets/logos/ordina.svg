@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="od" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#od)"/>
+  <!-- Calendar body -->
+  <rect x="18" y="24" width="64" height="58" rx="6" fill="white" opacity="0.95"/>
+  <!-- Calendar header -->
+  <rect x="18" y="24" width="64" height="18" rx="6" fill="#1D4ED8"/>
+  <rect x="18" y="36" width="64" height="6" fill="#1D4ED8"/>
+  <!-- Calendar rings -->
+  <rect x="33" y="18" width="6" height="14" rx="3" fill="white"/>
+  <rect x="61" y="18" width="6" height="14" rx="3" fill="white"/>
+  <!-- Calendar grid dots -->
+  <circle cx="31" cy="53" r="3" fill="#1D4ED8" opacity="0.5"/>
+  <circle cx="44" cy="53" r="3" fill="#1D4ED8" opacity="0.5"/>
+  <circle cx="57" cy="53" r="3" fill="#1D4ED8" opacity="0.5"/>
+  <circle cx="70" cy="53" r="3" fill="#1D4ED8" opacity="0.5"/>
+  <circle cx="31" cy="66" r="3" fill="#1D4ED8" opacity="0.5"/>
+  <circle cx="44" cy="66" r="3" fill="#1D4ED8" opacity="0.5"/>
+  <!-- AI checkmark -->
+  <polyline points="52,58 56,63 68,49" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
