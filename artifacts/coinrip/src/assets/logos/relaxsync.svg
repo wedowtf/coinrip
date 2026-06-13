@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="rs" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#4F46E5"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#rs)"/>
+  <!-- 20-sided die (icosahedron simplified) -->
+  <polygon points="50,14 68,26 74,46 62,64 38,64 26,46 32,26" fill="none" stroke="white" stroke-width="2.5" opacity="0.9"/>
+  <polygon points="50,14 68,26 50,36" fill="white" opacity="0.2"/>
+  <polygon points="68,26 74,46 62,64 50,50" fill="white" opacity="0.15"/>
+  <polygon points="26,46 38,64 50,50" fill="white" opacity="0.2"/>
+  <polygon points="50,14 32,26 50,36" fill="white" opacity="0.1"/>
+  <line x1="50" y1="36" x2="68" y2="26" stroke="white" stroke-width="1.5" opacity="0.6"/>
+  <line x1="50" y1="36" x2="32" y2="26" stroke="white" stroke-width="1.5" opacity="0.6"/>
+  <line x1="50" y1="36" x2="74" y2="46" stroke="white" stroke-width="1.5" opacity="0.5"/>
+  <line x1="50" y1="36" x2="26" y2="46" stroke="white" stroke-width="1.5" opacity="0.5"/>
+  <line x1="50" y1="36" x2="62" y2="64" stroke="white" stroke-width="1.5" opacity="0.4"/>
+  <line x1="50" y1="36" x2="38" y2="64" stroke="white" stroke-width="1.5" opacity="0.4"/>
+  <!-- zen dot -->
+  <circle cx="50" cy="78" r="4" fill="white" opacity="0.7"/>
+</svg>
