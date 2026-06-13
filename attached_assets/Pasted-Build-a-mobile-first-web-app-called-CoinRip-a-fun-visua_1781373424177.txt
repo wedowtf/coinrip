@@ -1,0 +1,95 @@
+Build a mobile-first web app called "CoinRip" — a fun, visually exciting "pack opening" game where users rip open digital packs to reveal random "coins" representing real products from the Orynth ecosystem (orynth.dev). Deploy as a static/frontend site suitable for GitHub Pages (plain HTML/CSS/JS or React + Vite, no backend required for MVP — use localStorage for user data).
+
+=== BRAND & VISUAL DIRECTION (CRITICAL — AVOID GENERIC AI LOOK) ===
+- Do NOT use generic "AI startup" aesthetics: no purple-blue gradients, no Inter/Poppins fonts, no rounded glassmorphism cards, no robot/circuit icons.
+- Theme: bold, energetic, collectible "trading card pack" vibes — think sneaker drops, sticker packs, arcade prize machines. Punchy, playful, high-contrast.
+- Color palette: dark near-black background (#0A0A0F) with vibrant accent colors per tier (see tier section). Use bold pops of color, not muted pastels.
+- Typography: use distinctive display fonts for headings — e.g. "Bricolage Grotesque", "Clash Display", "Space Grotesk", or "Archivo Black" for headers (load via Google Fonts or Fontshare). Body text in a clean grotesque like "Geist" or "Inter Tight" — avoid plain default Inter.
+- Logo: design an ORIGINAL logo for "CoinRip" — a torn/ripped pack icon combined with a coin shape. Suggest a custom SVG: a coin shape with a jagged "rip" tear across it, in a bold sticker/badge style. Do not use generic coin emoji or stock icons. Logo should appear in the top-left navbar.
+- Overall feel: satisfying, tactile, "gacha"/loot-box energy — lots of motion, glow effects, and tactile button presses.
+
+=== CORE PAGES / FLOW ===
+
+1. HOME / PACK SELECTION
+   - Hero section with the CoinRip logo, tagline ("Rip packs. Collect real ecosystem coins. Redeem later."), and a large animated pack illustration (CSS/SVG, can be a stylized torn foil pouch shape with gradient/holographic shimmer effect using CSS gradients + animation).
+   - Show available packs (e.g. "Free Daily Pack", "Mystery Pack") as horizontally scrollable cards.
+   - Show user's current balance/points and login status in the top nav.
+
+2. RIP ANIMATION SCREEN
+   - When user taps "Rip It (Free)", play a satisfying animation: pack shakes, then "tears" open (CSS clip-path or SVG mask animation splitting the pack image), with a flash/particle burst effect (simple CSS particles or canvas confetti).
+   - After animation, reveal the won "coin" card with a flip/zoom-in reveal animation, glow effect colored according to its tier rarity.
+
+3. COIN REVEAL CARD
+   - Display: coin/project logo (image), project name, tier name + tier badge color, market cap value, and a short tagline pulled from Orynth data.
+   - Buttons: "Add to Collection" (confirms) and "Rip Another" (if user has rips remaining).
+
+4. COLLECTION / PROFILE PAGE
+   - Grid of all coins the user has collected, grouped by tier, each showing thumbnail, name, tier, and quantity owned.
+   - "Redeem" button on each coin (disabled/labeled "Coming Soon" for MVP — tapping shows a tooltip/modal: "Redemption opens when this project joins the CoinRip reward pool").
+   - Show total collection stats (total rips, rarest coin owned, total coins collected).
+
+5. LOGIN / LOGOUT
+   - Simple login button in navbar (top-right). For MVP, implement as a mock auth: a modal asking for a username (stored in localStorage) — no real backend auth needed, but structure the code so a real auth provider (e.g. wallet connect or OAuth) can be swapped in later.
+   - When logged in, show username + avatar (generated placeholder, e.g. DiceBear-style identicon) and a "Logout" button that clears the session.
+   - When logged out, packs/rip button should be disabled with a prompt "Log in to start ripping".
+
+=== TIER SYSTEM (CUSTOM — NOT GENERIC RARITY NAMES) ===
+Use a "Cosmic Intensity" tier theme instead of Common/Rare/Epic/Legendary. Each tier maps to a market cap range from real Orynth project data, and has its own color + glow effect:
+
+- SPARK (lowest, <$7K market cap) — color: soft white/grey glow
+- FLARE ($7K–$10K) — color: orange glow
+- NOVA ($10K–$20K) — color: cyan/teal glow
+- PULSAR ($20K–$100K) — color: magenta/pink glow
+- SINGULARITY (>$100K, ultra rare) — color: gold/holographic rainbow glow with extra particle effects on reveal
+
+Higher tiers should have lower drop probability (weighted random). Singularity should feel like a jackpot — extra-long reveal animation, screen shake, confetti burst.
+
+=== COIN DATA (sample dataset — use these as placeholder entries, structured as a JSON array the dev can later expand by pulling live data/logos from orynth.dev) ===
+
+Each coin entry needs: name, tagline, marketCap (number), logoUrl (placeholder path — note in code comments that logos should be fetched/replaced with real images scraped from orynth.dev project pages), tier (auto-calculated from marketCap using the ranges above).
+
+Sample entries to seed the JSON:
+- Alpie — "An AI workspace" — marketCap: 1200000 → SINGULARITY
+- Orynth — "Where products find their first users" — marketCap: 384800 → SINGULARITY
+- Moonshift — "Type your idea. Wake up to a deployed app." — marketCap: 141800 → SINGULARITY
+- MangaNow — "Transform text, videos into manga" — marketCap: 75700 → PULSAR
+- MagTapp — "Browser, PDF, and productivity tools" — marketCap: 40400 → PULSAR
+- SuzuPay — "QR code payments" — marketCap: 22000 → PULSAR
+- Avocado AI — "Ship client-ready ads instantly" — marketCap: 19700 → NOVA
+- AVATAR UI — "Next-gen interface" — marketCap: 14600 → NOVA
+- Brain — "Infrastructure for AI agents" — marketCap: 11400 → NOVA
+- Relaxsync — "20-sided roll/rotate meditation tool" — marketCap: 10600 → NOVA
+- Ordina — "Your 24/7 AI secretary" — marketCap: 10300 → NOVA
+- Degen Terminal — "AI trading terminal" — marketCap: 9200 → FLARE
+- inspireXgrowth — "AI growth tools" — marketCap: 9000 → FLARE
+- Aniverse — "3D x AI next-gen experience" — marketCap: 7600 → FLARE
+- RedCircle — "Bringing Reddit posts to crypto" — marketCap: 7000 → FLARE
+- FeedRun — "Feedback forms" — marketCap: 6400 → SPARK
+- Whitespace — "Personalized meditation" — marketCap: 6400 → SPARK
+- XScouter AI — "Don't trust, verify, score" — marketCap: 6300 → SPARK
+- Cofounder Hunt — "Find your co-founder" — marketCap: 6200 → SPARK
+- lilAgents — "Agents you can hire" — marketCap: 6200 → SPARK
+
+Note in code: "Logo URLs are placeholders — replace with actual project icons scraped/downloaded from orynth.dev once available."
+
+=== GAMEPLAY RULES (MVP) ===
+- Logged-in users get 1 free pack rip every 24 hours (track timestamp in localStorage).
+- Each rip randomly selects one coin from the dataset using weighted probability (Spark most common, Singularity rarest — e.g. roughly Spark 45%, Flare 30%, Nova 15%, Pulsar 8%, Singularity 2%).
+- Each rip also awards a small amount of "2 COINS" in-app currency (visible balance in navbar) regardless of which project-coin is revealed — this is separate from the collectible project coins.
+- Store user's collection, currency balance, and last-rip-timestamp in localStorage keyed by username.
+
+=== TECHNICAL REQUIREMENTS ===
+- Mobile-first responsive design (primary target: phone screen ~375-430px wide), but should scale gracefully to tablet/desktop.
+- Built to be deployable on GitHub Pages — no server-side code, no API keys required for MVP. Use React + Vite (or vanilla HTML/CSS/JS if simpler) with all assets bundled.
+- Smooth animations via CSS transitions/keyframes (and Framer Motion if using React) — prioritize a "satisfying" tactile feel: button press scale-down, pack tear animation, card flip reveal, particle/confetti burst on rare pulls.
+- Bottom navigation bar (mobile pattern) with icons for: Home/Packs, Collection, Profile/Login.
+- Include a favicon using the custom CoinRip logo.
+- Add subtle sound-effect hooks (optional, can be commented out) for rip/reveal moments — use free CC0 sound files if included.
+
+=== PAGES SUMMARY ===
+1. Home — pack selection + rip CTA
+2. Rip/Reveal — animation + result
+3. Collection — grid of owned coins, redeem buttons (disabled/coming soon)
+4. Login modal — username-based mock auth, logout button in nav
+
+Build this as a complete, working, visually polished MVP. Prioritize the "fun and satisfying" feel of the rip animation and tier reveal glow effects above all else — this is the core hook of the app.
