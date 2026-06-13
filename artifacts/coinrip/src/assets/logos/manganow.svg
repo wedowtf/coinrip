@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="mg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF1744"/>
+      <stop offset="100%" stop-color="#D50000"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#mg)"/>
+  <line x1="50" y1="5" x2="5" y2="75" stroke="rgba(0,0,0,0.2)" stroke-width="4"/>
+  <line x1="50" y1="5" x2="20" y2="95" stroke="rgba(0,0,0,0.15)" stroke-width="3"/>
+  <line x1="50" y1="5" x2="50" y2="95" stroke="rgba(0,0,0,0.2)" stroke-width="4"/>
+  <line x1="50" y1="5" x2="80" y2="95" stroke="rgba(0,0,0,0.15)" stroke-width="3"/>
+  <line x1="50" y1="5" x2="95" y2="75" stroke="rgba(0,0,0,0.2)" stroke-width="4"/>
+  <rect x="18" y="18" width="64" height="64" rx="5" fill="none" stroke="white" stroke-width="3.5" opacity="0.9"/>
+  <text x="50" y="67" font-family="Arial Black,sans-serif" font-size="30" font-weight="900" fill="white" text-anchor="middle" opacity="0.95">MN</text>
+</svg>
