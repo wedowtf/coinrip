@@ -4,6 +4,7 @@ import Home from "@/pages/Home";
 import Rip from "@/pages/Rip";
 import Collection from "@/pages/Collection";
 import About from "@/pages/About";
+import Profile from "@/pages/Profile";
 import { Layout } from "@/components/layout/Layout";
 
 function Router() {
@@ -14,6 +15,7 @@ function Router() {
         <Route path="/rip" component={Rip} />
         <Route path="/collection" component={Collection} />
         <Route path="/about" component={About} />
+        <Route path="/profile" component={Profile} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
