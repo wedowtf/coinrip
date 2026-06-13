@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="fr" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EA580C"/>
+      <stop offset="100%" stop-color="#C2410C"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#fr)"/>
+  <!-- Speech bubble form -->
+  <rect x="16" y="18" width="68" height="52" rx="8" fill="white" opacity="0.95"/>
+  <polygon points="28,70 20,82 42,70" fill="white" opacity="0.95"/>
+  <!-- Form lines (survey) -->
+  <line x1="26" y1="32" x2="74" y2="32" stroke="#EA580C" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="26" y1="42" x2="74" y2="42" stroke="#EA580C" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="26" y1="52" x2="55" y2="52" stroke="#EA580C" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <!-- Checkmark -->
+  <polyline points="60,48 64,54 74,43" fill="none" stroke="#EA580C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
