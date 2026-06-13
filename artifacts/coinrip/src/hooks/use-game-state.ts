@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { PackId } from '@/lib/dataset';
 
 export interface OwnedCoin {
   name: string;
@@ -10,13 +11,15 @@ export interface GameState {
   coinBalance: number;
   lastRipTimestamp: number | null;
   collection: OwnedCoin[];
+  totalRips: number;
 }
 
 const DEFAULT_STATE: GameState = {
   username: null,
   coinBalance: 0,
   lastRipTimestamp: null,
-  collection: []
+  collection: [],
+  totalRips: 0,
 };
 
 const getStorageKey = (username: string) => `coinrip_state_${username}`;
@@ -28,9 +31,7 @@ export function useGameState() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('coinrip_active_user');
-    if (storedUser) {
-      setActiveUser(storedUser);
-    }
+    if (storedUser) setActiveUser(storedUser);
     setIsLoaded(true);
   }, []);
 
@@ -72,35 +73,47 @@ export function useGameState() {
   const addCoin = useCallback((coinName: string) => {
     if (!activeUser) return;
     const existing = state.collection.find(c => c.name === coinName);
-    let newCollection;
-    if (existing) {
-      newCollection = state.collection.map(c => 
-        c.name === coinName ? { ...c, quantity: c.quantity + 1 } : c
-      );
-    } else {
-      newCollection = [...state.collection, { name: coinName, quantity: 1 }];
-    }
-    
+    const newCollection = existing
+      ? state.collection.map(c => c.name === coinName ? { ...c, quantity: c.quantity + 1 } : c)
+      : [...state.collection, { name: coinName, quantity: 1 }];
+
     saveState({
       collection: newCollection,
       coinBalance: state.coinBalance + 2,
-      lastRipTimestamp: Date.now()
+      lastRipTimestamp: Date.now(),
+      totalRips: (state.totalRips || 0) + 1,
     });
   }, [state, activeUser, saveState]);
 
   const canRipFree = useCallback(() => {
     if (!state.lastRipTimestamp) return true;
-    const hours24 = 24 * 60 * 60 * 1000;
-    return (Date.now() - state.lastRipTimestamp) > hours24;
+    return (Date.now() - state.lastRipTimestamp) > 24 * 60 * 60 * 1000;
   }, [state.lastRipTimestamp]);
 
-  const payForRip = useCallback((cost: number) => {
+  const getTimeUntilFreeRip = useCallback(() => {
+    if (!state.lastRipTimestamp) return null;
+    const diff = 24 * 60 * 60 * 1000 - (Date.now() - state.lastRipTimestamp);
+    if (diff <= 0) return null;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    return `${h}h ${m}m`;
+  }, [state.lastRipTimestamp]);
+
+  const payForRip = useCallback((cost: number): boolean => {
     if (state.coinBalance >= cost) {
       saveState({ coinBalance: state.coinBalance - cost });
       return true;
     }
     return false;
   }, [state.coinBalance, saveState]);
+
+  const ripPack = useCallback((packId: PackId, cost: number, isFreeDaily: boolean): boolean => {
+    if (isFreeDaily) {
+      if (!canRipFree()) return false;
+      return true;
+    }
+    return payForRip(cost);
+  }, [canRipFree, payForRip]);
 
   return {
     state,
@@ -109,6 +122,8 @@ export function useGameState() {
     logout,
     addCoin,
     canRipFree,
-    payForRip
+    getTimeUntilFreeRip,
+    payForRip,
+    ripPack,
   };
 }
