@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="sp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#16A34A"/>
+      <stop offset="100%" stop-color="#15803D"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#sp)"/>
+  <!-- QR corner squares -->
+  <rect x="18" y="18" width="18" height="18" rx="3" fill="white"/>
+  <rect x="21" y="21" width="12" height="12" rx="2" fill="#16A34A"/>
+  <rect x="24" y="24" width="6" height="6" rx="1" fill="white"/>
+  <rect x="64" y="18" width="18" height="18" rx="3" fill="white"/>
+  <rect x="67" y="21" width="12" height="12" rx="2" fill="#16A34A"/>
+  <rect x="70" y="24" width="6" height="6" rx="1" fill="white"/>
+  <rect x="18" y="64" width="18" height="18" rx="3" fill="white"/>
+  <rect x="21" y="67" width="12" height="12" rx="2" fill="#16A34A"/>
+  <rect x="24" y="70" width="6" height="6" rx="1" fill="white"/>
+  <!-- Lightning bolt center -->
+  <polygon points="55,28 42,52 51,52 45,72 62,46 53,46" fill="white" opacity="0.95"/>
+</svg>
