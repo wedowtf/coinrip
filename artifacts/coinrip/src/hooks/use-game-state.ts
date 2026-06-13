@@ -10,6 +10,8 @@ export interface GameState {
   username: string | null;
   coinBalance: number;
   lastRipTimestamp: number | null;
+  lastFreeDailyTimestamp: number | null;
+  recentPulls: string[];
   collection: OwnedCoin[];
   totalRips: number;
 }
@@ -18,6 +20,8 @@ const DEFAULT_STATE: GameState = {
   username: null,
   coinBalance: 0,
   lastRipTimestamp: null,
+  lastFreeDailyTimestamp: null,
+  recentPulls: [],
   collection: [],
   totalRips: 0,
 };
@@ -41,7 +45,7 @@ export function useGameState() {
       if (storedState) {
         setState({ ...DEFAULT_STATE, ...JSON.parse(storedState), username: activeUser });
       } else {
-        const newState = { ...DEFAULT_STATE, username: activeUser };
+        const newState: GameState = { ...DEFAULT_STATE, username: activeUser, coinBalance: 0 };
         localStorage.setItem(getStorageKey(activeUser), JSON.stringify(newState));
         setState(newState);
       }
@@ -70,34 +74,43 @@ export function useGameState() {
     setActiveUser(null);
   }, []);
 
-  const addCoin = useCallback((coinName: string) => {
+  const addCoin = useCallback((coinName: string, packId?: PackId) => {
     if (!activeUser) return;
     const existing = state.collection.find(c => c.name === coinName);
     const newCollection = existing
       ? state.collection.map(c => c.name === coinName ? { ...c, quantity: c.quantity + 1 } : c)
       : [...state.collection, { name: coinName, quantity: 1 }];
 
-    saveState({
+    const newRecentPulls = [coinName, ...(state.recentPulls || [])].slice(0, 10);
+
+    const updates: Partial<GameState> = {
       collection: newCollection,
       coinBalance: state.coinBalance + 2,
       lastRipTimestamp: Date.now(),
       totalRips: (state.totalRips || 0) + 1,
-    });
+      recentPulls: newRecentPulls,
+    };
+
+    if (packId === 'daily') {
+      updates.lastFreeDailyTimestamp = Date.now();
+    }
+
+    saveState(updates);
   }, [state, activeUser, saveState]);
 
   const canRipFree = useCallback(() => {
-    if (!state.lastRipTimestamp) return true;
-    return (Date.now() - state.lastRipTimestamp) > 24 * 60 * 60 * 1000;
-  }, [state.lastRipTimestamp]);
+    if (!state.lastFreeDailyTimestamp) return true;
+    return (Date.now() - state.lastFreeDailyTimestamp) > 24 * 60 * 60 * 1000;
+  }, [state.lastFreeDailyTimestamp]);
 
   const getTimeUntilFreeRip = useCallback(() => {
-    if (!state.lastRipTimestamp) return null;
-    const diff = 24 * 60 * 60 * 1000 - (Date.now() - state.lastRipTimestamp);
+    if (!state.lastFreeDailyTimestamp) return null;
+    const diff = 24 * 60 * 60 * 1000 - (Date.now() - state.lastFreeDailyTimestamp);
     if (diff <= 0) return null;
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     return `${h}h ${m}m`;
-  }, [state.lastRipTimestamp]);
+  }, [state.lastFreeDailyTimestamp]);
 
   const payForRip = useCallback((cost: number): boolean => {
     if (state.coinBalance >= cost) {
