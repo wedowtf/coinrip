@@ -63,7 +63,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             className="font-display font-black text-xl tracking-tight"
             style={{ textShadow: '0 0 20px rgba(226,255,0,0.3)' }}
           >
-            CoinRip
+            CoinFlip
           </span>
         </Link>
 
@@ -249,7 +249,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Logo className="w-14 h-14 mx-auto sticker-shadow" />
               </motion.div>
               <DialogTitle className="font-display text-2xl uppercase tracking-tight text-center text-white">
-                Enter the Rip
+                Enter the Flip
               </DialogTitle>
               <p className="text-xs text-muted-foreground text-center">Pick a username — no signup needed</p>
             </DialogHeader>
@@ -267,8 +267,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
               <div className="grid grid-cols-3 gap-2 text-center text-[10px] text-muted-foreground">
                 {[
-                  { top: 'Free', sub: 'Daily rip' },
-                  { top: '+2', sub: 'Per rip' },
+                  { top: 'Free', sub: 'Daily flip' },
+                  { top: '+2', sub: 'Per flip' },
                   { top: '50', sub: 'Welcome' },
                 ].map((item, i) => (
                   <motion.div
@@ -291,7 +291,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   className="w-full h-13 font-display font-bold text-base uppercase bg-primary text-black hover:bg-primary/90 active:scale-95 transition-transform rounded-2xl"
                   style={{ boxShadow: '0 4px 24px rgba(226,255,0,0.4), 0 0 50px rgba(226,255,0,0.15)' }}
                 >
-                  Start Ripping →
+                  Start Flipping →
                 </Button>
               </motion.div>
             </form>
