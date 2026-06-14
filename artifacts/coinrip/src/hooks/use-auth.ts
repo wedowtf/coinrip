@@ -13,20 +13,25 @@ interface AuthCtx {
   logOut: () => Promise<void>;
   authError: string | null;
   magicLinkSent: boolean;
+  googleNotEnabled: boolean;
   clearError: () => void;
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
 
 function parseError(msg: string): string {
-  if (msg.includes("Invalid login credentials")) return "Incorrect email or password";
-  if (msg.includes("Email not confirmed")) return "Please verify your email first";
-  if (msg.includes("User already registered")) return "Email is already registered";
-  if (msg.includes("Password should be at least")) return "Password must be at least 6 characters";
-  if (msg.includes("Unable to validate email")) return "Invalid email address";
-  if (msg.includes("Email rate limit exceeded")) return "Too many attempts — use Magic Link instead";
-  if (msg.includes("over_email_send_rate_limit")) return "Too many attempts — use Magic Link instead";
-  return msg || "Sign-in failed, please try again";
+  if (msg.includes("Unsupported provider") || msg.includes("provider is not enabled"))
+    return "Google login belum diaktifkan di Supabase — gunakan Email atau Magic Link";
+  if (msg.includes("Invalid login credentials")) return "Email atau password salah";
+  if (msg.includes("Email not confirmed")) return "Cek email kamu untuk verifikasi akun dulu";
+  if (msg.includes("User already registered")) return "Email sudah terdaftar, coba Sign In";
+  if (msg.includes("Password should be at least")) return "Password minimal 6 karakter";
+  if (msg.includes("Unable to validate email") || msg.includes("invalid email"))
+    return "Format email tidak valid";
+  if (msg.includes("Email rate limit exceeded") || msg.includes("over_email_send_rate_limit"))
+    return "Terlalu banyak percobaan — coba Magic Link";
+  if (msg.includes("For security purposes")) return "Tunggu sebentar sebelum mencoba lagi";
+  return msg || "Login gagal, coba lagi";
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -35,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [googleNotEnabled, setGoogleNotEnabled] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -50,7 +56,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const clearError = useCallback(() => { setAuthError(null); setMagicLinkSent(false); }, []);
+  const clearError = useCallback(() => {
+    setAuthError(null);
+    setMagicLinkSent(false);
+    setGoogleNotEnabled(false);
+  }, []);
 
   const signInEmail = useCallback(async (email: string, password: string) => {
     setAuthError(null);
@@ -70,11 +80,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInGoogle = useCallback(async () => {
     setAuthError(null);
+    setGoogleNotEnabled(false);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin },
     });
-    if (error) { setAuthError(parseError(error.message)); throw error; }
+    if (error) {
+      const isProviderError =
+        error.message.includes("Unsupported provider") ||
+        error.message.includes("provider is not enabled");
+      if (isProviderError) setGoogleNotEnabled(true);
+      setAuthError(parseError(error.message));
+      throw error;
+    }
   }, []);
 
   const signInMagicLink = useCallback(async (email: string) => {
@@ -94,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return React.createElement(
     Ctx.Provider,
-    { value: { user, session, isLoaded, signInEmail, signUpEmail, signInGoogle, signInMagicLink, logOut, authError, magicLinkSent, clearError } },
+    { value: { user, session, isLoaded, signInEmail, signUpEmail, signInGoogle, signInMagicLink, logOut, authError, magicLinkSent, googleNotEnabled, clearError } },
     children
   );
 }
@@ -104,4 +122,3 @@ export function useAuth(): AuthCtx {
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }
-
