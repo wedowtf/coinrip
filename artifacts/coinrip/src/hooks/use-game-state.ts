@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useContext, createContext } from 'react';
+import React, { useState, useEffect, useCallback, useContext, createContext } from 'react';
 import { PackId } from '@/lib/dataset';
 
 export interface OwnedCoin {
@@ -135,12 +135,11 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
     return `${h}h ${m}m`;
   }, [state.lastFreeDailyTimestamp]);
 
-  return (
-    <Ctx.Provider
-      value={{ state, isLoaded, login, logout, addCoin, canRipFree, getTimeUntilFreeRip, payForRip }}
-    >
-      {children}
-    </Ctx.Provider>
+  // .ts file — cannot use JSX, use createElement instead
+  return React.createElement(
+    Ctx.Provider,
+    { value: { state, isLoaded, login, logout, addCoin, canRipFree, getTimeUntilFreeRip, payForRip } },
+    children
   );
 }
 
