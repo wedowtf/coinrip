@@ -9,22 +9,22 @@ function CoinMini({ logoUrl, name, tierColor }: { logoUrl: string; name: string;
   const [err, setErr] = useState(false);
   return (
     <div
-      className="w-16 h-16 rounded-full flex items-center justify-center border-2 overflow-hidden shrink-0"
+      className="w-14 h-14 rounded-full flex items-center justify-center border-2 overflow-hidden shrink-0"
       style={{
         borderColor: tierColor + "99",
         background: `radial-gradient(circle, ${tierColor}30, ${tierColor}10)`,
-        boxShadow: `0 0 14px ${tierColor}55`,
+        boxShadow: `0 0 10px ${tierColor}55`,
       }}
     >
       {!err && logoUrl ? (
         <img
           src={logoUrl}
           alt={name}
-          className="w-10 h-10 object-contain"
+          className="w-9 h-9 object-contain"
           onError={() => setErr(true)}
         />
       ) : (
-        <span className="font-display font-black text-lg" style={{ color: tierColor }}>
+        <span className="font-display font-black text-base" style={{ color: tierColor }}>
           {name.charAt(0)}
         </span>
       )}
@@ -62,7 +62,7 @@ function getPreviewCoins(pack: PackDef) {
     .map(([t]) => t);
   const pool = COINS.filter(c => eligible.includes(c.tier));
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, 4);
+  return shuffled.slice(0, 6);
 }
 
 function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequired }: {
@@ -89,7 +89,7 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
 
   return (
     <div
-      className="snap-center shrink-0 w-[280px] h-[400px] cursor-pointer"
+      className="snap-center shrink-0 w-[290px] h-[460px] cursor-pointer"
       style={{ perspective: "1000px" }}
       onClick={() => setIsFlipped(f => !f)}
     >
@@ -100,13 +100,13 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
       >
         {/* ── FRONT ── */}
         <div
-          className="absolute inset-0 rounded-3xl border-2 p-5 flex flex-col gap-3 overflow-hidden card-shine"
+          className="absolute inset-0 rounded-3xl border-2 p-5 flex flex-col gap-2.5 overflow-hidden card-shine"
           style={{
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
             borderColor: isAvailable ? pack.color + "CC" : "#1E1E28",
             boxShadow: isAvailable
-              ? `0 0 36px ${pack.shadowColor}, 0 0 80px ${pack.shadowColor}44, inset 0 1px 0 rgba(255,255,255,0.1)`
+              ? `0 0 40px ${pack.shadowColor}, 0 0 90px ${pack.shadowColor}44, inset 0 1px 0 rgba(255,255,255,0.1)`
               : "inset 0 1px 0 rgba(255,255,255,0.02)",
             opacity: isAvailable ? 1 : 0.5,
             background: isAvailable
@@ -120,20 +120,14 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
               className="absolute inset-0 pointer-events-none z-20 rounded-3xl"
               style={{ background: `linear-gradient(108deg, transparent 33%, ${pack.color}35 50%, transparent 67%)` }}
               initial={{ x: "-100%" }}
-              animate={{ x: "280%" }}
+              animate={{ x: "290%" }}
               transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 4, ease: "easeInOut" }}
             />
           )}
-
-          {/* Corner glows */}
-          <div
-            className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none"
-            style={{ background: `radial-gradient(circle, ${pack.color}40, transparent 70%)` }}
-          />
-          <div
-            className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full pointer-events-none"
-            style={{ background: `radial-gradient(circle, ${pack.shadowColor} 0%, transparent 70%)` }}
-          />
+          <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${pack.color}40, transparent 70%)` }} />
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${pack.shadowColor} 0%, transparent 70%)` }} />
 
           {pack.badgeLabel && (
             <motion.span
@@ -145,17 +139,14 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
               {pack.badgeLabel}
             </motion.span>
           )}
-
-          {/* Flip hint */}
           <div className="absolute top-4 left-4 z-10 flex items-center gap-1 opacity-40">
             <RotateCcw className="w-3 h-3 text-white" />
             <span className="text-[8px] text-white font-semibold uppercase tracking-wider">Info</span>
           </div>
-
           <div className="absolute inset-0 bg-gradient-to-b from-white/6 via-transparent to-black/40 pointer-events-none rounded-3xl" />
 
-          {/* Pack name — pushed down for badge/hint */}
-          <div className="z-10 mt-4">
+          {/* Pack name */}
+          <div className="z-10 mt-5">
             <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: pack.color }}>
               {pack.subtitle}
             </p>
@@ -167,7 +158,7 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
             </h3>
           </div>
 
-          {/* Coin preview grid */}
+          {/* 6-coin preview — 3×2 grid */}
           <div
             className="w-full rounded-2xl p-3 z-10 relative overflow-hidden"
             style={{
@@ -175,13 +166,13 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
               border: `1px solid ${pack.color}44`,
             }}
           >
-            <div className="grid grid-cols-2 gap-2 mb-2">
-              {previewCoins.slice(0, 4).map((coin, i) => (
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              {previewCoins.map((coin, i) => (
                 <motion.div
-                  key={coin.name}
+                  key={coin.name + i}
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.07, type: "spring", stiffness: 300, damping: 18 }}
+                  transition={{ delay: i * 0.06, type: "spring", stiffness: 300, damping: 18 }}
                   className="flex items-center justify-center"
                 >
                   <CoinMini
@@ -205,10 +196,10 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
             </div>
           </div>
 
-          <p className="text-[10px] text-zinc-500 z-10 leading-snug flex-1">{pack.description}</p>
+          <p className="text-[10px] text-zinc-500 z-10 leading-snug">{pack.description}</p>
 
           <button
-            className="w-full h-12 rounded-xl font-display font-bold text-sm uppercase tracking-wide z-10 transition-all active:scale-95 flex items-center justify-center gap-1.5"
+            className="w-full h-12 rounded-xl font-display font-bold text-sm uppercase tracking-wide z-10 transition-all active:scale-95 flex items-center justify-center gap-1.5 mt-auto"
             style={{
               background: isAvailable
                 ? `linear-gradient(135deg, ${pack.color}, ${pack.color}CC)`
@@ -224,9 +215,9 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
             }}
           >
             {isFree ? (
-              isAvailable ? "🎁 Rip Free" : (timeLeft ?? "⏳ Tomorrow")
+              isAvailable ? "🎁 Rip Free — 6 Coins" : (timeLeft ?? "⏳ Tomorrow")
             ) : isAvailable ? (
-              `RIP — ${pack.cost} 🪙`
+              `RIP — ${pack.cost} 🪙 · 6 coins`
             ) : (
               <span className="flex items-center gap-1">
                 <Lock className="w-3.5 h-3.5" /> {pack.cost} COINS
@@ -244,35 +235,24 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
             transform: "rotateY(180deg)",
             borderColor: pack.color + "CC",
             background: `linear-gradient(160deg, ${pack.color}18 0%, #0A0A12 55%, ${pack.shadowColor}0C 100%)`,
-            boxShadow: `0 0 36px ${pack.shadowColor}, inset 0 1px 0 rgba(255,255,255,0.08)`,
+            boxShadow: `0 0 40px ${pack.shadowColor}, inset 0 1px 0 rgba(255,255,255,0.08)`,
           }}
         >
-          {/* Corner glows back */}
-          <div
-            className="absolute -top-10 -left-10 w-40 h-40 rounded-full pointer-events-none"
-            style={{ background: `radial-gradient(circle, ${pack.color}35, transparent 70%)` }}
-          />
-          <div
-            className="absolute -bottom-8 -right-8 w-28 h-28 rounded-full pointer-events-none"
-            style={{ background: `radial-gradient(circle, ${pack.shadowColor}, transparent 70%)` }}
-          />
-
-          {/* Shimmer sweep back */}
+          <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${pack.color}35, transparent 70%)` }} />
+          <div className="absolute -bottom-8 -right-8 w-28 h-28 rounded-full pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${pack.shadowColor}, transparent 70%)` }} />
           <motion.div
             className="absolute inset-0 pointer-events-none z-20 rounded-3xl"
             style={{ background: `linear-gradient(108deg, transparent 33%, ${pack.color}25 50%, transparent 67%)` }}
             initial={{ x: "-100%" }}
-            animate={{ x: "280%" }}
+            animate={{ x: "290%" }}
             transition={{ duration: 3, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
           />
-
           <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-black/40 pointer-events-none rounded-3xl" />
 
-          {/* Header */}
           <div className="z-10">
-            <p className="text-[9px] font-bold uppercase tracking-widest opacity-60" style={{ color: pack.color }}>
-              Pack Info
-            </p>
+            <p className="text-[9px] font-bold uppercase tracking-widest opacity-60" style={{ color: pack.color }}>Pack Info · 6 coins per rip</p>
             <h3
               className="font-display text-2xl font-black uppercase leading-tight text-white"
               style={{ textShadow: `0 0 28px ${pack.color}80` }}
@@ -282,15 +262,11 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
             <p className="text-[10px] text-zinc-400 mt-0.5 leading-snug">{pack.description}</p>
           </div>
 
-          {/* Divider */}
-          <div
-            className="h-px w-full z-10"
-            style={{ background: `linear-gradient(90deg, transparent, ${pack.color}60, transparent)` }}
-          />
+          <div className="h-px w-full z-10"
+            style={{ background: `linear-gradient(90deg, transparent, ${pack.color}60, transparent)` }} />
 
-          {/* Drop rates */}
           <div className="z-10 flex flex-col gap-2 flex-1">
-            <p className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Drop Rates</p>
+            <p className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Drop Rates per Coin</p>
             {eligibleTiers.map(([tier, weight], i) => {
               const pct = Math.round((weight / totalWeight) * 100);
               const color = TIER_COLORS[tier as Tier];
@@ -324,7 +300,6 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
             })}
           </div>
 
-          {/* Cost + flip hint */}
           <div className="z-10 flex items-center justify-between">
             <div
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
@@ -387,7 +362,6 @@ export default function Home() {
       {/* ── Hero ── */}
       <div className="relative overflow-hidden px-6 pt-7 pb-3">
         <div className="absolute inset-0 bg-grid opacity-60 pointer-events-none" />
-
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <motion.div
             className="absolute -top-14 -left-14 w-56 h-56 rounded-full blur-3xl"
@@ -417,7 +391,7 @@ export default function Home() {
         >
           <motion.div className="inline-flex flex-col items-center">
             <motion.h1
-              className="text-6xl font-display font-extrabold uppercase italic tracking-tighter sticker-shadow"
+              className="text-6xl font-display font-extrabold uppercase italic tracking-tighter"
               style={{ color: "#E2FF00", textShadow: "0 0 40px rgba(226,255,0,0.5), 0 2px 0 rgba(0,0,0,0.9)" }}
               animate={{
                 textShadow: [
@@ -438,14 +412,13 @@ export default function Home() {
               transition={{ delay: 0.4, duration: 0.6, ease: "easeOut" }}
             />
           </motion.div>
-
           <motion.p
             className="text-sm text-zinc-400 font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            Rip packs. Collect real ecosystem coins. Redeem later.
+            Rip packs. Get 6 real coins each. Collect &amp; redeem later.
           </motion.p>
 
           <AnimatePresence>
@@ -478,7 +451,7 @@ export default function Home() {
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ duration: 2.5, repeat: Infinity }}
             >
-              Press LOGIN ↑ to get started free
+              Press LOGIN ↑ to get 500 free demo coins
             </motion.p>
           )}
         </motion.div>
@@ -511,11 +484,11 @@ export default function Home() {
                   Welcome, {state.username}! 🎉
                 </p>
                 <p className="text-[11px] text-black/70 font-semibold leading-snug mt-0.5">
-                  <strong className="font-black">+50 COINS</strong> added to your wallet — start ripping!
+                  <strong className="font-black">+500 demo COINS</strong> loaded — start ripping packs!
                 </p>
               </div>
               <div className="shrink-0 text-right">
-                <p className="font-mono font-black text-2xl text-black">50</p>
+                <p className="font-mono font-black text-2xl text-black">500</p>
                 <p className="text-[9px] font-black text-black/60 uppercase">COINS</p>
               </div>
             </div>
@@ -523,7 +496,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* ── Stats bar (logged in) ── */}
+      {/* ── Stats bar ── */}
       {state.username && (
         <div className="flex gap-2 px-6">
           {[
@@ -544,15 +517,10 @@ export default function Home() {
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
-              <div
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-px"
-                style={{ background: `linear-gradient(90deg, transparent, ${s.accent}60, transparent)` }}
-              />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-px"
+                style={{ background: `linear-gradient(90deg, transparent, ${s.accent}60, transparent)` }} />
               <p className="text-base mb-0.5">{s.icon}</p>
-              <p
-                className="font-mono font-black text-xl"
-                style={{ color: s.accent, textShadow: `0 0 14px ${s.accent}80` }}
-              >
+              <p className="font-mono font-black text-xl" style={{ color: s.accent, textShadow: `0 0 14px ${s.accent}80` }}>
                 {s.value}
               </p>
               <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">{s.label}</p>
@@ -568,7 +536,7 @@ export default function Home() {
             Available Packs
           </h2>
           <div className="flex items-center gap-2">
-            <span className="text-[9px] text-zinc-500 font-medium italic">tap card for drop info</span>
+            <span className="text-[9px] text-zinc-500 font-medium italic">tap card for drop rates</span>
             <motion.span
               className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full"
               style={{ background: "#E2FF0020", color: "#E2FF00", border: "1px solid rgba(226,255,0,0.2)" }}
