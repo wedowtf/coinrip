@@ -153,6 +153,24 @@ export default function About() {
         </div>
       </div>
 
+      {/* Orynth badge */}
+      <div className="flex flex-col items-center gap-3">
+        <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold">Featured on</p>
+        <a
+          href="https://orynth.dev/projects/coinflip"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src="https://orynth.dev/api/badge/coinflip?theme=light&style=default"
+            alt="Featured on Orynth"
+            width="260"
+            height="80"
+            className="rounded-xl"
+          />
+        </a>
+      </div>
+
       {/* Orynth link */}
       <a
         href="https://orynth.dev"
