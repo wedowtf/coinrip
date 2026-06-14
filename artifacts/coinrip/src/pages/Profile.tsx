@@ -17,12 +17,12 @@ const TIER_META = {
 
 type TierKey = keyof typeof TIER_META;
 
-const getRank = (totalRips: number): { title: string; color: string; shadow: string } => {
-  if (totalRips >= 100) return { title: 'ORYNTH LEGEND',   color: '#FBBF24', shadow: 'rgba(251,191,36,0.4)' };
-  if (totalRips >= 50)  return { title: 'COLLECTOR ELITE', color: '#D946EF', shadow: 'rgba(217,70,239,0.35)' };
-  if (totalRips >= 20)  return { title: 'VAULT SEEKER',    color: '#06B6D4', shadow: 'rgba(6,182,212,0.35)' };
-  if (totalRips >= 6)   return { title: 'PACK JUNKIE',     color: '#F97316', shadow: 'rgba(249,115,22,0.3)' };
-  return { title: 'ROOKIE RIPPER', color: '#E2E8F0', shadow: 'rgba(226,232,240,0.2)' };
+const getRank = (totalFlips: number): { title: string; color: string; shadow: string } => {
+  if (totalFlips >= 100) return { title: 'ORYNTH LEGEND',   color: '#FBBF24', shadow: 'rgba(251,191,36,0.4)' };
+  if (totalFlips >= 50)  return { title: 'COLLECTOR ELITE', color: '#D946EF', shadow: 'rgba(217,70,239,0.35)' };
+  if (totalFlips >= 20)  return { title: 'VAULT SEEKER',    color: '#06B6D4', shadow: 'rgba(6,182,212,0.35)' };
+  if (totalFlips >= 6)   return { title: 'PACK JUNKIE',     color: '#F97316', shadow: 'rgba(249,115,22,0.3)' };
+  return { title: 'ROOKIE FLIPPER', color: '#E2E8F0', shadow: 'rgba(226,232,240,0.2)' };
 };
 
 function CoinLogo({ logoUrl, name, color }: { logoUrl: string; name: string; color: string }) {
@@ -68,7 +68,7 @@ export default function Profile() {
     );
   }
 
-  const rank = getRank(state.totalRips || 0);
+  const rank = getRank(state.totalFlips || 0);
   const uniqueCount = state.collection.length;
   const totalCoins = COINS.length;
   const completionPct = Math.round((uniqueCount / totalCoins) * 100);
@@ -184,7 +184,7 @@ export default function Profile() {
       {/* ─── Stats Row ─── */}
       <div className="grid grid-cols-3 gap-2.5">
         {[
-          { label: 'Total Rips',   value: state.totalRips || 0,                                     icon: <Zap className="w-3 h-3" />,     color: '#E2FF00' },
+          { label: 'Total Flips',  value: state.totalFlips || 0,                                    icon: <Zap className="w-3 h-3" />,     color: '#E2FF00' },
           { label: 'Unique Coins', value: uniqueCount,                                               icon: <Package className="w-3 h-3" />, color: '#06B6D4' },
           { label: 'Best Tier',    value: highestTier ? TIER_META[highestTier].label : '—',          icon: <Trophy className="w-3 h-3" />,  color: highestTier ? TIER_META[highestTier].color : '#555' },
         ].map((s, i) => (
@@ -319,7 +319,7 @@ export default function Profile() {
       {/* ─── Quick Actions ─── */}
       <div className="grid grid-cols-2 gap-3">
         {[
-          { label: 'Go', sub: 'Rip Packs', href: '/', icon: <Package className="w-4 h-4" />, color: '#E2FF00' },
+          { label: 'Go', sub: 'Flip Packs', href: '/', icon: <Package className="w-4 h-4" />, color: '#E2FF00' },
           { label: 'Browse', sub: 'My Vault', href: '/collection', icon: <LayoutGrid className="w-4 h-4" />, color: '#06B6D4' },
         ].map(item => (
           <motion.button
@@ -358,8 +358,8 @@ export default function Profile() {
         <h3 className="font-display font-black text-sm uppercase tracking-widest text-white">Achievements</h3>
         <div className="grid grid-cols-1 gap-2">
           {[
-            { icon: '🎯', title: 'First Blood',   desc: 'Rip your first pack',    done: (state.totalRips || 0) >= 1,          color: '#E2FF00' },
-            { icon: '🔥', title: 'Pack Addict',   desc: 'Rip 10 packs',           done: (state.totalRips || 0) >= 10,         color: '#F97316' },
+            { icon: '🎯', title: 'First Blood',   desc: 'Flip your first pack',   done: (state.totalFlips || 0) >= 1,         color: '#E2FF00' },
+            { icon: '🔥', title: 'Pack Addict',   desc: 'Flip 10 packs',          done: (state.totalFlips || 0) >= 10,        color: '#F97316' },
             { icon: '⚡', title: 'FLARE Hunter',  desc: 'Collect a FLARE coin',   done: enriched.some(c => c.tier === 'FLARE'), color: '#F97316' },
             { icon: '💎', title: 'Nova Breaker',  desc: 'Collect a NOVA coin',    done: enriched.some(c => c.tier === 'NOVA'),  color: '#06B6D4' },
             { icon: '🌸', title: 'Pulsar Touch',  desc: 'Collect a PULSAR coin',  done: enriched.some(c => c.tier === 'PULSAR'), color: '#D946EF' },
