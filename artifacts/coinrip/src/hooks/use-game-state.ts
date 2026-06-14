@@ -39,6 +39,7 @@ interface GameStateCtx {
   getTimeUntilFreeFlip: () => string | null;
   payForFlip: (cost: number) => boolean;
   refreshState: () => Promise<void>;
+  updateUsername: (newName: string) => Promise<void>;
 }
 
 const Ctx = createContext<GameStateCtx | null>(null);
@@ -73,6 +74,8 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
     try {
       const data = await apiClient.getState(u.id);
       setState(stateFromResponse(data, displayName));
+      // Sync display name to game_states (ensures leaderboard is up to date)
+      void apiClient.upsertState(u.id, displayName, data).catch(() => {});
     } catch {
       setState({ ...DEFAULT_STATE, username: displayName, coinBalance: 500 });
     } finally {
@@ -98,6 +101,18 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
       setState(stateFromResponse(data, displayNameFromUser(user)));
     } catch { /* ignore */ }
   }, [user]);
+
+  const updateUsername = useCallback(async (newName: string) => {
+    if (!user) return;
+    const currentState: GameStateResponse = {
+      coinBalance: state.coinBalance,
+      totalFlips: state.totalFlips,
+      lastFreeDailyTimestamp: state.lastFreeDailyTimestamp,
+      collection: state.collection,
+    };
+    await apiClient.upsertState(user.id, newName, currentState);
+    setState(prev => ({ ...prev, username: newName }));
+  }, [user, state]);
 
   const login = useCallback((_username: string) => {}, []);
 
@@ -131,8 +146,7 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
   }, [user, state]);
 
   const payForFlip = useCallback((cost: number): boolean => {
-    if (state.coinBalance < cost) return false;
-    return true;
+    return state.coinBalance >= cost;
   }, [state.coinBalance]);
 
   const canFlipFree = useCallback((): boolean => {
@@ -151,7 +165,7 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
 
   return React.createElement(
     Ctx.Provider,
-    { value: { state, isLoaded, login, logout, flipPack, canFlipFree, getTimeUntilFreeFlip, payForFlip, refreshState } },
+    { value: { state, isLoaded, login, logout, flipPack, canFlipFree, getTimeUntilFreeFlip, payForFlip, refreshState, updateUsername } },
     children,
   );
 }
