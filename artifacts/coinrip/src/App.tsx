@@ -6,6 +6,7 @@ import Collection from "@/pages/Collection";
 import About from "@/pages/About";
 import Profile from "@/pages/Profile";
 import { Layout } from "@/components/layout/Layout";
+import { GameStateProvider } from "@/hooks/use-game-state";
 
 function Router() {
   return (
@@ -24,9 +25,11 @@ function Router() {
 
 function App() {
   return (
-    <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-      <Router />
-    </WouterRouter>
+    <GameStateProvider>
+      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <Router />
+      </WouterRouter>
+    </GameStateProvider>
   );
 }
 
