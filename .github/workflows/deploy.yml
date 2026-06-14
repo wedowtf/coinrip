@@ -46,6 +46,9 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: pnpm run build
 
+      - name: Fix SPA routing for GitHub Pages
+        run: cp artifacts/coinrip/dist/public/index.html artifacts/coinrip/dist/public/404.html
+
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
@@ -63,4 +66,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
