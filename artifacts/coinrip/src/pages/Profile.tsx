@@ -39,9 +39,11 @@ function CoinLogo({ logoUrl, name, color }: { logoUrl: string; name: string; col
 }
 
 export default function Profile() {
-  const { state, logout } = useGameState();
+  const { state, logout, isLoaded } = useGameState();
   const [, setLocation] = useLocation();
   const [showLogout, setShowLogout] = useState(false);
+
+  if (!isLoaded) return <div className="min-h-[80vh]" />;
 
   if (!state.username) {
     return (
