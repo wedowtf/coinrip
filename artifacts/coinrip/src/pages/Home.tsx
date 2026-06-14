@@ -384,132 +384,158 @@ function PackCard({
 
         </motion.div>
 
-        {/* ══ BACK — drop rates ══ */}
+        {/* ══ BACK — physical package back label ══ */}
         <div
-          className="absolute inset-0 rounded-[20px] overflow-hidden flex flex-col cursor-pointer"
+          className="absolute inset-0 overflow-hidden flex flex-col"
           style={{
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
             transform: "rotateY(180deg)",
-            background: `linear-gradient(160deg, ${p.bg}CC 0%, #0A0A14 40%, #0a0a12 100%)`,
+            borderRadius: 20,
             boxShadow: physicalShadow,
+            cursor: "pointer",
           }}
           onClick={() => setIsFlipped(false)}
         >
-          {/* Texture */}
-          <div className="absolute inset-0 opacity-15" style={{
-            backgroundImage: `repeating-linear-gradient(-48deg, transparent, transparent 8px, ${p.bg}20 8px, ${p.bg}20 16px)`,
-          }} />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50 pointer-events-none" />
-          <div className="absolute top-0 left-4 right-4 h-px" style={{
-            background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)`,
-          }} />
-
-          {/* Animated shimmer */}
-          <motion.div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: `linear-gradient(108deg, transparent 30%, ${p.bg}30 50%, transparent 70%)` }}
-            initial={{ x: "-100%" }} animate={{ x: "250%" }}
-            transition={{ duration: 3, repeat: Infinity, repeatDelay: 4 }}
-          />
-
-          {/* Header */}
-          <div className="relative z-10 px-4 pt-4 pb-2">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[8px] font-bold uppercase tracking-widest" style={{ color: p.bg + "AA" }}>
-                  DROP RATES
-                </p>
-                <h3 className="font-display text-2xl font-black uppercase text-white leading-tight"
-                  style={{ textShadow: `0 0 20px ${p.bg}80` }}>
-                  {pack.name}
-                </h3>
-              </div>
-              <span
-                className="text-[7px] font-black uppercase px-2 py-0.5 rounded-full mt-1"
-                style={{ background: p.bg + "22", color: p.bg, border: `1px solid ${p.bg}40` }}>
-                6/rip
-              </span>
+          {/* ── TOP CRIMP (same as front) ── */}
+          <div style={{ height: CRIMP, background: p.crimp, position: "relative", overflow: "hidden", flexShrink: 0 }}>
+            <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2.5px, rgba(0,0,0,0.10) 2.5px, rgba(0,0,0,0.10) 3.5px)` }} />
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "linear-gradient(180deg, rgba(255,255,255,0.45), transparent)" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 100%)" }} />
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: 8, fontWeight: 900, color: p.text + "80", textTransform: "uppercase", letterSpacing: "0.3em" }}>COINRIP</span>
             </div>
-            <div className="mt-2 h-px" style={{
-              background: `linear-gradient(90deg, ${p.bg}80, transparent)`,
-            }} />
           </div>
 
-          {/* Rates bars */}
-          <div className="relative z-10 flex-1 px-4 flex flex-col gap-2.5 overflow-y-auto">
-            {eligibleTiers.map(([tier, weight], i) => {
-              const pct = Math.round((weight / totalWeight) * 100);
-              const color = TIER_COLORS[tier as Tier];
-              const bright: Record<Tier, string> = {
-                SPARK: "#94A3B8", FLARE: "#FB923C", NOVA: "#38BDF8",
-                PULSAR: "#D946EF", SINGULARITY: "#FBBF24",
-              };
-              const c = bright[tier as Tier] ?? color;
-              return (
-                <div key={tier} className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span style={{ color: c, fontSize: 11, fontWeight: 900 }}>{TIER_ICONS[tier as Tier]}</span>
-                      <span className="text-[10px] font-black uppercase tracking-wide" style={{ color: c }}>{tier}</span>
-                    </div>
-                    <span className="text-[10px] font-mono font-black px-2 py-0.5 rounded-full"
-                      style={{ background: c + "1E", color: c, border: `1px solid ${c}30` }}>{pct}%</span>
-                  </div>
-                  <div className="h-2 rounded-full overflow-hidden" style={{ background: c + "16", border: `1px solid ${c}18` }}>
-                    <motion.div className="h-full rounded-full"
-                      style={{ background: `linear-gradient(90deg, ${c}, ${c}99)`, boxShadow: `0 0 8px ${c}` }}
-                      initial={{ width: 0 }}
-                      animate={{ width: isFlipped ? `${pct}%` : 0 }}
-                      transition={{ delay: i * 0.09 + 0.15, duration: 0.65, ease: "easeOut" }} />
-                  </div>
+          {/* ── MAIN BACK BODY ── */}
+          <div style={{ flex: 1, background: p.bg, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            {/* Diagonal triangle accent */}
+            <div style={{ position: "absolute", top: 0, right: 0, width: 0, height: 0, borderStyle: "solid", borderWidth: `0 ${W}px ${Math.round((H - CRIMP*2) * 0.22)}px 0`, borderColor: `transparent ${p.tri} transparent transparent`, opacity: 0.85 }} />
+            {/* Gloss */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(145deg, rgba(255,255,255,0.40) 0%, transparent 40%)", pointerEvents: "none" }} />
+            {/* Bottom shadow */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 65%, rgba(0,0,0,0.08) 100%)", pointerEvents: "none" }} />
+            {/* Shine sweep */}
+            <motion.div
+              style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "linear-gradient(108deg, transparent 25%, rgba(255,255,255,0.28) 48%, rgba(255,255,255,0.10) 52%, transparent 75%)" }}
+              initial={{ x: "-100%" }} animate={{ x: "200%" }}
+              transition={{ duration: 2.8, repeat: Infinity, repeatDelay: 5, ease: "easeInOut" }}
+            />
+
+            {/* Content */}
+            <div style={{ position: "relative", zIndex: 10, flex: 1, display: "flex", flexDirection: "column", padding: "10px 14px 8px" }}>
+
+              {/* Brand + pack name */}
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
+                <div>
+                  <p style={{ fontSize: 7, fontWeight: 900, color: p.sub, textTransform: "uppercase", letterSpacing: "0.25em" }}>{pack.subtitle}</p>
+                  <h3 style={{ fontSize: pack.name.length > 9 ? 22 : 26, fontWeight: 900, color: p.text, textTransform: "uppercase", lineHeight: 0.92, textShadow: "0 1px 0 rgba(255,255,255,0.5)" }}>{pack.name}</h3>
                 </div>
-              );
-            })}
-          </div>
+                <div style={{ textAlign: "right" }}>
+                  <p style={{ fontSize: 7, fontWeight: 900, color: p.sub, textTransform: "uppercase", lineHeight: 1.2 }}>Per Serving</p>
+                  <p style={{ fontSize: 20, fontWeight: 900, color: p.text, lineHeight: 1 }}>6</p>
+                  <p style={{ fontSize: 7, fontWeight: 700, color: p.sub, textTransform: "uppercase" }}>Coins</p>
+                </div>
+              </div>
 
-          {/* Coin grid */}
-          <div className="relative z-10 px-4 py-3">
-            <div className="h-px mb-2.5"
-              style={{ background: `linear-gradient(90deg, transparent, ${p.bg}60, transparent)` }} />
-            <div className="grid grid-cols-3 gap-x-3 gap-y-1.5">
-              {previewCoins.map((coin, i) => {
-                const [e2, setE2] = useState(false);
-                const c = TIER_COLORS[coin.tier];
-                return (
-                  <motion.div key={coin.name + i}
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: isFlipped ? 1 : 0, scale: isFlipped ? 1 : 0.7 }}
-                    transition={{ delay: i * 0.07 + 0.3, type: "spring", stiffness: 280, damping: 22 }}
-                    className="flex flex-col items-center gap-0.5"
-                  >
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden"
-                      style={{
-                        background: `radial-gradient(circle, ${c}28, #0a0a1200)`,
-                        border: `1.5px solid ${c}44`,
-                        boxShadow: `0 0 8px ${c}33`,
-                      }}>
-                      {!e2 && coin.logoUrl ? (
-                        <img src={coin.logoUrl} alt={coin.name} className="w-7 h-7 object-contain"
-                          onError={() => setE2(true)} />
-                      ) : (
-                        <span className="font-display font-black text-sm" style={{ color: c }}>{coin.name[0]}</span>
+              {/* ── NUTRITION FACTS style divider ── */}
+              <div style={{ borderTop: `3px solid ${p.text}CC`, borderBottom: `1px solid ${p.text}44`, padding: "3px 0", marginBottom: 6 }}>
+                <p style={{ fontSize: 9, fontWeight: 900, color: p.text, textTransform: "uppercase", letterSpacing: "0.08em" }}>Drop Rates</p>
+              </div>
+
+              {/* Rate rows */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 8 }}>
+                {eligibleTiers.map(([tier, weight], i) => {
+                  const pct = Math.round((weight / totalWeight) * 100);
+                  const tierDark: Record<Tier, string> = {
+                    SPARK: "#485870", FLARE: "#8B2E08", NOVA: "#004870", PULSAR: "#580088", SINGULARITY: "#604800",
+                  };
+                  const dc = tierDark[tier as Tier] ?? p.sub;
+                  return (
+                    <div key={tier}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 3 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                          <span style={{ fontSize: 9, fontWeight: 900, color: p.text }}>{TIER_ICONS[tier as Tier]}</span>
+                          <span style={{ fontSize: 8, fontWeight: 900, color: p.text, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                            {tier === "SINGULARITY" ? "SING" : tier}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: 9, fontWeight: 900, fontFamily: "monospace", color: p.text + "CC" }}>{pct}%</span>
+                      </div>
+                      {/* Bar track */}
+                      <div style={{ height: 5, borderRadius: 3, background: "rgba(0,0,0,0.12)", overflow: "hidden" }}>
+                        <motion.div
+                          style={{ height: "100%", borderRadius: 3, background: `linear-gradient(90deg, ${dc}, ${dc}99)` }}
+                          initial={{ width: 0 }}
+                          animate={{ width: isFlipped ? `${pct}%` : 0 }}
+                          transition={{ delay: i * 0.08 + 0.18, duration: 0.55, ease: "easeOut" }}
+                        />
+                      </div>
+                      {i < eligibleTiers.length - 1 && (
+                        <div style={{ borderBottom: `0.5px solid ${p.text}25`, marginTop: 5 }} />
                       )}
                     </div>
-                    <span className="text-[7.5px] font-black tracking-wide" style={{ color: c }}>{coin.ticker}</span>
-                  </motion.div>
-                );
-              })}
+                  );
+                })}
+              </div>
+
+              {/* ── Ingredients (coin logos) ── */}
+              <div style={{ borderTop: `1px solid ${p.text}44`, paddingTop: 6, marginBottom: 6 }}>
+                <p style={{ fontSize: 7, fontWeight: 900, color: p.sub, textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: 5 }}>
+                  Contains
+                </p>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 3 }}>
+                  {previewCoins.map((coin, i) => {
+                    const [e2, setE2] = useState(false);
+                    return (
+                      <motion.div key={coin.name + i}
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: isFlipped ? 1 : 0, scale: isFlipped ? 1 : 0.5 }}
+                        transition={{ delay: i * 0.06 + 0.35, type: "spring", stiffness: 300, damping: 22 }}
+                        style={{
+                          width: 28, height: 28, borderRadius: "50%",
+                          background: "rgba(0,0,0,0.12)",
+                          border: "1.5px solid rgba(0,0,0,0.14)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {!e2 && coin.logoUrl ? (
+                          <img src={coin.logoUrl} alt={coin.name}
+                            style={{ width: 20, height: 20, objectFit: "contain" }}
+                            onError={() => setE2(true)} />
+                        ) : (
+                          <span style={{ fontSize: 9, fontWeight: 900, color: p.text + "88" }}>{coin.name[0]}</span>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Flip back hint */}
+              <div style={{
+                marginTop: "auto",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                gap: 4, opacity: 0.5,
+              }}>
+                <span style={{ fontSize: 7, fontWeight: 700, color: p.text, textTransform: "uppercase", letterSpacing: "0.15em" }}>
+                  Tap to flip back
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Back button */}
-          <div className="relative z-10 px-4 pb-4">
-            <button
-              className="w-full h-9 rounded-2xl font-bold text-xs uppercase tracking-wider text-zinc-400"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-              onClick={(e) => { e.stopPropagation(); setIsFlipped(false); }}
-            >← Back to Pack</button>
+          {/* ── BOTTOM CRIMP (same as front) ── */}
+          <div style={{ height: CRIMP, background: p.crimp, position: "relative", overflow: "hidden", flexShrink: 0 }}>
+            <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2.5px, rgba(0,0,0,0.10) 2.5px, rgba(0,0,0,0.10) 3.5px)` }} />
+            <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 6, background: "linear-gradient(0deg, rgba(0,0,0,0.20), transparent)" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 100%)" }} />
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 2 }}>
+              {Array.from({ length: 20 }).map((_, i) => (
+                <div key={i} style={{ width: i % 3 === 0 ? 2 : 1, height: i % 5 === 0 ? 14 : 10, background: p.text + "50", borderRadius: 1 }} />
+              ))}
+            </div>
           </div>
         </div>
 
