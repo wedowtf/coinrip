@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/Logo";
 import { useAuth } from "@/hooks/use-auth";
-import { Mail, Lock, User, AlertCircle, Loader2 } from "lucide-react";
+import { Mail, Lock, User, AlertCircle, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
 
 interface LoginModalProps {
   open: boolean;
@@ -23,34 +23,33 @@ function GoogleIcon() {
   );
 }
 
+type Tab = "login" | "register" | "magic";
+
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
-  const { signInEmail, signUpEmail, signInGoogle, authError, clearError } = useAuth();
-  const [tab, setTab] = useState<"login" | "register">("login");
+  const { signInEmail, signUpEmail, signInGoogle, signInMagicLink, authError, magicLinkSent, clearError } = useAuth();
+  const [tab, setTab] = useState<Tab>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const resetForm = () => {
-    setEmail(""); setPassword(""); setName(""); clearError();
-  };
-
-  const handleClose = (v: boolean) => {
-    if (!v) resetForm();
-    onOpenChange(v);
-  };
+  const resetForm = () => { setEmail(""); setPassword(""); setName(""); clearError(); };
+  const handleClose = (v: boolean) => { if (!v) resetForm(); onOpenChange(v); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (tab === "login") {
+      if (tab === "magic") {
+        await signInMagicLink(email);
+      } else if (tab === "login") {
         await signInEmail(email, password);
+        handleClose(false);
       } else {
         await signUpEmail(email, password, name);
+        handleClose(false);
       }
-      handleClose(false);
     } catch {
       // error handled in hook
     } finally {
@@ -60,13 +59,14 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
-    try {
-      await signInGoogle();
-      // page will redirect to Google — no need to close modal
-    } catch {
-      setGoogleLoading(false);
-    }
+    try { await signInGoogle(); } catch { setGoogleLoading(false); }
   };
+
+  const TABS: { key: Tab; label: string }[] = [
+    { key: "login", label: "Sign In" },
+    { key: "register", label: "Register" },
+    { key: "magic", label: "Magic Link" },
+  ];
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -84,124 +84,158 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
               <Logo className="w-12 h-12 mx-auto sticker-shadow" />
             </motion.div>
             <DialogTitle className="font-display text-2xl uppercase tracking-tight text-center text-white">
-              {tab === "login" ? "Welcome Back" : "Join the Flip"}
+              {tab === "login" ? "Welcome Back" : tab === "register" ? "Join the Flip" : "Magic Link"}
             </DialogTitle>
           </DialogHeader>
 
           {/* Tab switcher */}
           <div className="relative z-10 flex rounded-2xl bg-white/5 border border-white/8 p-1 mt-3 mb-4">
-            {(["login", "register"] as const).map((t) => (
+            {TABS.map((t) => (
               <button
-                key={t}
-                onClick={() => { setTab(t); clearError(); }}
-                className="flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-200"
-                style={tab === t ? {
+                key={t.key}
+                onClick={() => { setTab(t.key); clearError(); }}
+                className="flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200"
+                style={tab === t.key ? {
                   background: "linear-gradient(135deg, rgba(226,255,0,0.2), rgba(226,255,0,0.08))",
                   color: "#E2FF00",
                   border: "1px solid rgba(226,255,0,0.3)",
                   boxShadow: "0 0 12px rgba(226,255,0,0.15)",
                 } : { color: "rgba(255,255,255,0.4)" }}
               >
-                {t === "login" ? "Sign In" : "Register"}
+                {t.label}
               </button>
             ))}
           </div>
 
-          {/* Google button */}
-          <motion.button
-            onClick={handleGoogle}
-            disabled={googleLoading || loading}
-            whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-            className="relative z-10 w-full flex items-center justify-center gap-2.5 rounded-2xl border border-white/12 bg-white/6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20 mb-3"
-          >
-            {googleLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
-            {googleLoading ? "Redirecting to Google…" : "Continue with Google"}
-          </motion.button>
+          {/* Google button — hide on magic tab */}
+          <AnimatePresence>
+            {tab !== "magic" && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
+                <motion.button
+                  onClick={handleGoogle}
+                  disabled={googleLoading || loading}
+                  whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+                  className="relative z-10 w-full flex items-center justify-center gap-2.5 rounded-2xl border border-white/12 bg-white/6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20 mb-3"
+                >
+                  {googleLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
+                  {googleLoading ? "Redirecting to Google…" : "Continue with Google"}
+                </motion.button>
+                <div className="relative z-10 flex items-center gap-3 mb-3">
+                  <div className="flex-1 h-px bg-white/8" />
+                  <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">or</span>
+                  <div className="flex-1 h-px bg-white/8" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <div className="relative z-10 flex items-center gap-3 mb-3">
-            <div className="flex-1 h-px bg-white/8" />
-            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">or</span>
-            <div className="flex-1 h-px bg-white/8" />
-          </div>
-
-          <form onSubmit={handleSubmit} className="relative z-10 flex flex-col gap-2.5">
-            <AnimatePresence>
-              {tab === "register" && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                    <Input
-                      placeholder="Display name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="pl-10 bg-white/5 border-white/10 rounded-xl h-12 text-sm"
-                      maxLength={20}
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-              <Input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 bg-white/5 border-white/10 rounded-xl h-12 text-sm"
-                required
-              />
-            </div>
-
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 bg-white/5 border-white/10 rounded-xl h-12 text-sm"
-                required
-                minLength={6}
-              />
-            </div>
-
-            <AnimatePresence>
-              {authError && (
-                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold text-red-400"
-                  style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)" }}>
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                  {authError}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                type="submit"
-                disabled={loading || googleLoading}
-                className="w-full h-12 font-display font-bold text-sm uppercase bg-primary text-black hover:bg-primary/90 rounded-2xl"
-                style={{ boxShadow: "0 4px 24px rgba(226,255,0,0.4)" }}
+          {/* Magic link sent state */}
+          <AnimatePresence>
+            {magicLinkSent && tab === "magic" && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative z-10 flex flex-col items-center gap-3 py-6 text-center"
               >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : tab === "login" ? "Sign In →" : "Create Account →"}
-              </Button>
-            </motion.div>
-          </form>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 280, damping: 16, delay: 0.1 }}
+                >
+                  <CheckCircle2 className="w-12 h-12" style={{ color: "#E2FF00", filter: "drop-shadow(0 0 12px rgba(226,255,0,0.6))" }} />
+                </motion.div>
+                <p className="font-display font-black text-lg text-white uppercase">Check your inbox!</p>
+                <p className="text-sm text-zinc-400">Magic link sent to <span className="text-white font-semibold">{email}</span>. Click the link to sign in instantly.</p>
+                <button onClick={() => { clearError(); setEmail(""); }} className="text-xs text-primary/70 font-bold hover:text-primary transition-colors mt-1">
+                  Use a different email
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <p className="relative z-10 text-center text-[10px] text-zinc-600 mt-3">
-            {tab === "login" ? "Don't have an account? " : "Already have an account? "}
-            <button
-              onClick={() => { setTab(tab === "login" ? "register" : "login"); clearError(); }}
-              className="text-primary/80 font-bold hover:text-primary transition-colors"
-            >
-              {tab === "login" ? "Sign up now" : "Sign in"}
-            </button>
-          </p>
+          {/* Form */}
+          {(!magicLinkSent || tab !== "magic") && (
+            <form onSubmit={handleSubmit} className="relative z-10 flex flex-col gap-2.5">
+              <AnimatePresence>
+                {tab === "register" && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                    <div className="relative">
+                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                      <Input placeholder="Display name" value={name} onChange={(e) => setName(e.target.value)}
+                        className="pl-10 bg-white/5 border-white/10 rounded-xl h-12 text-sm" maxLength={20} />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 bg-white/5 border-white/10 rounded-xl h-12 text-sm" required />
+              </div>
+
+              <AnimatePresence>
+                {tab !== "magic" && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                    <div className="relative">
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                      <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
+                        className="pl-10 bg-white/5 border-white/10 rounded-xl h-12 text-sm" required={tab !== "magic"} minLength={6} />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {tab === "magic" && (
+                <p className="text-[10px] text-zinc-500 text-center px-2">
+                  No password needed — we send a login link to your email via Resend. No rate limits.
+                </p>
+              )}
+
+              <AnimatePresence>
+                {authError && (
+                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold text-red-400"
+                    style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)" }}>
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    {authError}
+                    {authError.includes("Magic Link") && (
+                      <button type="button" onClick={() => { setTab("magic"); clearError(); }}
+                        className="ml-auto text-primary font-bold underline text-[10px]">Switch</button>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+                <Button type="submit" disabled={loading || googleLoading}
+                  className="w-full h-12 font-display font-bold text-sm uppercase bg-primary text-black hover:bg-primary/90 rounded-2xl"
+                  style={{ boxShadow: "0 4px 24px rgba(226,255,0,0.4)" }}>
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> :
+                    tab === "login" ? "Sign In →" :
+                    tab === "register" ? "Create Account →" :
+                    <><Sparkles className="w-4 h-4 mr-1" />Send Magic Link</>}
+                </Button>
+              </motion.div>
+            </form>
+          )}
+
+          {tab !== "magic" && (
+            <p className="relative z-10 text-center text-[10px] text-zinc-600 mt-3">
+              {tab === "login" ? "No password? " : "Already have an account? "}
+              <button
+                onClick={() => { setTab(tab === "login" ? "register" : "login"); clearError(); }}
+                className="text-primary/80 font-bold hover:text-primary transition-colors"
+              >
+                {tab === "login" ? "Use Magic Link" : "Sign in"}
+              </button>
+            </p>
+          )}
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
