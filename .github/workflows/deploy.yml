@@ -36,7 +36,7 @@ jobs:
         working-directory: artifacts/coinrip
         env:
           PORT: "3000"
-          BASE_PATH: /coinrip/
+          BASE_PATH: /
           NODE_ENV: production
           VITE_FIREBASE_API_KEY: "AIzaSyBWWxphPouvBF5BHcugNjX7Flj4_XG5zuE"
           VITE_FIREBASE_AUTH_DOMAIN: "coinflip-23314.firebaseapp.com"
@@ -61,3 +61,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
