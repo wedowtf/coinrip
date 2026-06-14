@@ -10,7 +10,7 @@ const TIERS = [
 ];
 
 const ROADMAP = [
-  { phase: '01', title: 'Launch', items: ['Pack opening game', '6 pack types', '20 orynth.dev coins', 'Local collection vault'], done: true },
+  { phase: '01', title: 'Launch', items: ['Pack flipping game', '6 pack types', '20 orynth.dev coins', 'Local collection vault'], done: true },
   { phase: '02', title: 'Expand', items: ['Live orynth.dev price feeds', 'Project logo verification', 'Daily quests & streaks', 'Leaderboard'], done: false },
   { phase: '03', title: 'Redeem', items: ['Real coin redemptions', 'Project reward pools', 'Trading between users', 'NFT minting'], done: false },
 ];
@@ -26,10 +26,10 @@ export default function About() {
         transition={{ duration: 0.5 }}
       >
         <h1 className="text-4xl font-display font-extrabold uppercase italic tracking-tighter text-primary sticker-shadow">
-          About CoinRip
+          About CoinFlip
         </h1>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
-          CoinRip is the pack-opening game for the <strong className="text-white">Orynth ecosystem</strong> — 
+          CoinFlip is the pack-flipping game for the <strong className="text-white">Orynth ecosystem</strong> — 
           real products, real market caps, collectible rarity.
         </p>
       </motion.div>
@@ -37,18 +37,18 @@ export default function About() {
       {/* What is it */}
       <div className="space-y-3">
         <h2 className="font-display text-base font-black uppercase tracking-widest text-white flex items-center gap-2">
-          <Package className="w-4 h-4 text-primary" /> What is CoinRip?
+          <Package className="w-4 h-4 text-primary" /> What is CoinFlip?
         </h2>
         <div className="bg-secondary/30 border border-border rounded-2xl p-4 space-y-3 text-sm text-zinc-300 leading-relaxed">
           <p>
-            CoinRip turns <strong className="text-white">orynth.dev</strong> — a marketplace where products find their first users — into a collectible card game.
+            CoinFlip turns <strong className="text-white">orynth.dev</strong> — a marketplace where products find their first users — into a collectible card game.
           </p>
           <p>
             Every product listed on Orynth has a real market cap. That market cap determines its <strong className="text-white">rarity tier</strong>. 
             Higher cap = rarer coin = harder to pull.
           </p>
           <p>
-            Rip packs. Collect coins. Once projects join the reward pool, you'll be able to redeem your coins for real perks, discounts, and access.
+            Flip packs. Collect coins. Once projects join the reward pool, you'll be able to redeem your coins for real perks, discounts, and access.
           </p>
         </div>
       </div>
@@ -61,8 +61,8 @@ export default function About() {
         <div className="flex flex-col gap-3">
           {[
             { step: '1', title: 'Log in', desc: 'Pick a username. Your vault is saved locally — no account needed.' },
-            { step: '2', title: 'Rip a pack', desc: 'Grab your free daily pack, or spend COINS on premium packs with better drop rates.' },
-            { step: '3', title: 'Collect coins', desc: 'Every rip adds a project coin to your vault and earns you 2 COINS.' },
+            { step: '2', title: 'Flip a pack', desc: 'Grab your free daily pack, or spend COINS on premium packs with better drop rates.' },
+            { step: '3', title: 'Collect coins', desc: 'Every flip adds a project coin to your vault and earns you 2 COINS.' },
             { step: '4', title: 'Redeem (soon)', desc: 'When projects join the reward pool, trade your coins for real perks.' },
           ].map(item => (
             <div key={item.step} className="flex gap-3 bg-secondary/30 border border-border rounded-xl p-3">
@@ -113,7 +113,7 @@ export default function About() {
             <span className="text-muted-foreground font-bold uppercase tracking-wider">COINS</span>
           </div>
           {[
-            ['Any rip (any pack)', '+2'],
+            ['Any flip (any pack)', '+2'],
             ['Free Daily Pack', '0'],
             ['Mystery Pack', '-10'],
             ['Starter Bundle', '-25'],
