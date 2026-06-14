@@ -52,9 +52,9 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
               <Logo className="w-12 h-12 mx-auto sticker-shadow" />
             </motion.div>
             <DialogTitle className="font-display text-2xl uppercase tracking-tight text-center text-white">
-              Magic Link
+              Sign In
             </DialogTitle>
-            <p className="text-xs text-zinc-500">Masukkan email — kami kirimkan link login langsung.</p>
+            <p className="text-xs text-zinc-500">Enter your email — we'll send a login link instantly.</p>
           </DialogHeader>
 
           {/* Magic link sent state */}
@@ -72,15 +72,15 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 >
                   <CheckCircle2 className="w-12 h-12" style={{ color: "#E2FF00", filter: "drop-shadow(0 0 12px rgba(226,255,0,0.6))" }} />
                 </motion.div>
-                <p className="font-display font-black text-lg text-white uppercase">Cek inbox kamu!</p>
+                <p className="font-display font-black text-lg text-white uppercase">Check your inbox!</p>
                 <p className="text-sm text-zinc-400">
-                  Magic link dikirim ke <span className="text-white font-semibold">{email}</span>. Klik link itu untuk langsung masuk.
+                  Magic link sent to <span className="text-white font-semibold">{email}</span>. Click the link to sign in instantly.
                 </p>
                 <button
                   onClick={() => { clearError(); setEmail(""); }}
                   className="text-xs text-primary/70 font-bold hover:text-primary transition-colors mt-1"
                 >
-                  Ganti email
+                  Use a different email
                 </button>
               </motion.div>
             )}
@@ -93,7 +93,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <Input
                   type="email"
-                  placeholder="Email"
+                  placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 bg-white/5 border-white/10 rounded-xl h-12 text-sm"
@@ -102,7 +102,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
               </div>
 
               <p className="text-[10px] text-zinc-500 text-center px-2">
-                Tanpa password — kami kirim link login ke email kamu. Tidak ada rate limit.
+                No password needed — we'll email you a magic link to sign in.
               </p>
 
               <AnimatePresence>
@@ -129,7 +129,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 >
                   {loading
                     ? <Loader2 className="w-4 h-4 animate-spin" />
-                    : <><Sparkles className="w-4 h-4 mr-1" />Kirim Magic Link</>
+                    : <><Sparkles className="w-4 h-4 mr-1" />Send Magic Link</>
                   }
                 </Button>
               </motion.div>
