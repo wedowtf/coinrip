@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useContext, createContext } from 'react';
-import type { Session, User } from '@supabase/supabase-js';
-import { type PackId } from '@/lib/dataset';
+import type { User } from '@supabase/supabase-js';
+import { type PackId, PACKS } from '@/lib/dataset';
 import { useAuth } from '@/hooks/use-auth';
 import { apiClient, type FlipResult, type GameStateResponse } from '@/lib/api-client';
 
@@ -65,13 +65,13 @@ function stateFromResponse(resp: GameStateResponse, username: string): GameState
 }
 
 export function GameStateProvider({ children }: { children: React.ReactNode }) {
-  const { user, session, isLoaded: authLoaded, logOut } = useAuth();
+  const { user, isLoaded: authLoaded, logOut } = useAuth();
   const [state, setState] = useState<GameState>(DEFAULT_STATE);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const loadFromServer = useCallback(async (s: Session, displayName: string) => {
+  const loadFromServer = useCallback(async (u: User, displayName: string) => {
     try {
-      const data = await apiClient.getState(s.access_token);
+      const data = await apiClient.getState(u.id);
       setState(stateFromResponse(data, displayName));
     } catch {
       setState({ ...DEFAULT_STATE, username: displayName, coinBalance: 500 });
@@ -82,22 +82,22 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!authLoaded) return;
-    if (user && session) {
+    if (user) {
       setIsLoaded(false);
-      loadFromServer(session, displayNameFromUser(user));
+      loadFromServer(user, displayNameFromUser(user));
     } else {
       setState(DEFAULT_STATE);
       setIsLoaded(true);
     }
-  }, [user, session, authLoaded, loadFromServer]);
+  }, [user, authLoaded, loadFromServer]);
 
   const refreshState = useCallback(async () => {
-    if (!session || !user) return;
+    if (!user) return;
     try {
-      const data = await apiClient.getState(session.access_token);
+      const data = await apiClient.getState(user.id);
       setState(stateFromResponse(data, displayNameFromUser(user)));
     } catch { /* ignore */ }
-  }, [session, user]);
+  }, [user]);
 
   const login = useCallback((_username: string) => {}, []);
 
@@ -107,37 +107,31 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
   }, [logOut]);
 
   const flipPack = useCallback(async (packId: PackId): Promise<FlipResult> => {
-    if (!session) throw new Error('Not authenticated');
-    const result = await apiClient.flip(session.access_token, packId);
-    setState(prev => {
-      let newCollection = [...prev.collection];
-      for (const coin of result.coins) {
-        const existing = newCollection.find(c => c.name === coin.name);
-        if (existing) {
-          newCollection = newCollection.map(c =>
-            c.name === coin.name ? { ...c, quantity: c.quantity + 1 } : c,
-          );
-        } else {
-          newCollection = [...newCollection, { name: coin.name, quantity: 1 }];
-        }
-      }
-      return {
-        ...prev,
-        coinBalance: result.newBalance,
-        totalFlips: result.totalFlips,
-        lastFlipTimestamp: Date.now(),
-        collection: newCollection,
-        ...(result.lastFreeDailyTimestamp
-          ? { lastFreeDailyTimestamp: result.lastFreeDailyTimestamp }
-          : {}),
-      };
-    });
+    if (!user) throw new Error('Not authenticated');
+    const pack = PACKS.find(p => p.id === packId);
+    const packCost = pack?.cost ?? 0;
+    const username = displayNameFromUser(user);
+    const currentState: GameStateResponse = {
+      coinBalance: state.coinBalance,
+      totalFlips: state.totalFlips,
+      lastFreeDailyTimestamp: state.lastFreeDailyTimestamp,
+      collection: state.collection,
+    };
+    const result = await apiClient.flip(user.id, username, packId, packCost, currentState);
+    setState(prev => ({
+      ...prev,
+      coinBalance: result.newBalance,
+      totalFlips: result.totalFlips,
+      lastFlipTimestamp: Date.now(),
+      ...(result.lastFreeDailyTimestamp != null
+        ? { lastFreeDailyTimestamp: result.lastFreeDailyTimestamp }
+        : {}),
+    }));
     return result;
-  }, [session]);
+  }, [user, state]);
 
   const payForFlip = useCallback((cost: number): boolean => {
     if (state.coinBalance < cost) return false;
-    setState(prev => ({ ...prev, coinBalance: prev.coinBalance - cost }));
     return true;
   }, [state.coinBalance]);
 
