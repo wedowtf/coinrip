@@ -9,18 +9,22 @@ function CoinMini({ logoUrl, name, tierColor }: { logoUrl: string; name: string;
   const [err, setErr] = useState(false);
   return (
     <div
-      className="w-10 h-10 rounded-full flex items-center justify-center border-2 overflow-hidden shrink-0"
-      style={{ borderColor: tierColor + "99", background: tierColor + "22" }}
+      className="w-14 h-14 rounded-full flex items-center justify-center border-2 overflow-hidden shrink-0"
+      style={{
+        borderColor: tierColor + "99",
+        background: `radial-gradient(circle, ${tierColor}30, ${tierColor}10)`,
+        boxShadow: `0 0 8px ${tierColor}44`,
+      }}
     >
       {!err && logoUrl ? (
         <img
           src={logoUrl}
           alt={name}
-          className="w-7 h-7 object-contain"
+          className="w-9 h-9 object-contain"
           onError={() => setErr(true)}
         />
       ) : (
-        <span className="font-display font-black text-sm" style={{ color: tierColor }}>
+        <span className="font-display font-black text-base" style={{ color: tierColor }}>
           {name.charAt(0)}
         </span>
       )}
@@ -94,25 +98,23 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
         </h3>
       </div>
 
-      {/* Coin logos preview — THE KEY FIX */}
+      {/* ── Coin logos preview 2×2 grid ── */}
       <div
-        className="w-full rounded-xl p-2 flex flex-col items-center gap-2 z-10 relative overflow-hidden"
+        className="w-full rounded-2xl p-3 z-10 relative overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, ${pack.shadowColor}, ${pack.color}11)`,
-          border: `1px solid ${pack.color}33`,
-          minHeight: "100px",
+          background: `linear-gradient(145deg, ${pack.color}18, ${pack.shadowColor} 120%)`,
+          border: `1px solid ${pack.color}40`,
         }}
       >
-        {/* Row of coin logos */}
-        <div className="flex gap-2 justify-center flex-wrap">
+        {/* 2×2 grid — always exactly 2 per row */}
+        <div className="grid grid-cols-2 gap-2 mb-2">
           {previewCoins.slice(0, 4).map((coin, i) => (
             <motion.div
               key={coin.name}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.07 }}
-              className="relative"
-              style={{ marginTop: i % 2 === 1 ? 6 : 0 }}
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.07, type: "spring", stiffness: 280, damping: 18 }}
+              className="flex items-center justify-center"
             >
               <CoinMini
                 logoUrl={coin.logoUrl}
@@ -122,40 +124,46 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
             </motion.div>
           ))}
         </div>
-        {/* Tier drop hint */}
+        {/* Tier chips */}
         <div className="flex items-center gap-1 flex-wrap justify-center">
           {eligibleTiers.slice(0, 3).map(([tier]) => (
             <span
               key={tier}
-              className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded-full"
-              style={{ backgroundColor: TIER_COLORS[tier as Tier] + "33", color: TIER_COLORS[tier as Tier] }}
+              className="text-[7px] font-black uppercase px-1.5 py-0.5 rounded-full leading-none"
+              style={{ backgroundColor: TIER_COLORS[tier as Tier] + "30", color: TIER_COLORS[tier as Tier] }}
             >
-              {tier === "SINGULARITY" ? "✦ SING" : tier}
+              {tier === "SINGULARITY" ? "✦SING" : tier}
             </span>
           ))}
         </div>
       </div>
 
-      <p className="text-[9px] text-zinc-400 z-10 leading-snug">{pack.description}</p>
+      <p className="text-[9px] text-zinc-500 z-10 leading-snug">{pack.description}</p>
 
       <button
-        className="w-full h-10 rounded-xl font-display font-bold text-sm uppercase tracking-wide z-10 transition-all active:scale-95 flex items-center justify-center gap-1.5"
+        className="w-full h-11 rounded-xl font-display font-bold text-sm uppercase tracking-wide z-10 transition-all active:scale-95 flex items-center justify-center gap-1.5"
         style={{
-          backgroundColor: isAvailable ? pack.color : "#2A2A35",
-          color: isAvailable ? "#000" : "#555",
-          cursor: isAvailable ? "pointer" : "default",
+          background: isAvailable
+            ? `linear-gradient(135deg, ${pack.color}, ${pack.color}CC)`
+            : "#1E1E28",
+          color: isAvailable ? "#000" : "#444",
+          cursor: isAvailable ? "pointer" : "not-allowed",
+          boxShadow: isAvailable ? `0 4px 14px ${pack.shadowColor}` : "none",
         }}
         onClick={() => {
           if (isAvailable) onRip();
-          else if (!canAfford && !isFree) onLoginRequired();
+          else onLoginRequired();
         }}
       >
-        {!isAvailable && !isFree && <Lock className="w-3 h-3" />}
-        {isFree
-          ? isAvailable
-            ? "Rip Free"
-            : timeLeft ?? "Tomorrow"
-          : `${pack.cost} COINS`}
+        {isFree ? (
+          isAvailable ? "🎁 Rip Free" : (timeLeft ?? "⏳ Tomorrow")
+        ) : isAvailable ? (
+          `RIP — ${pack.cost} 🪙`
+        ) : (
+          <span className="flex items-center gap-1">
+            <Lock className="w-3 h-3" /> {pack.cost} COINS
+          </span>
+        )}
       </button>
     </motion.div>
   );
