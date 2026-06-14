@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useContext, createContext } from 'react';
 import { PackId } from '@/lib/dataset';
+import { useAuth } from '@/hooks/use-auth';
 
 export interface OwnedCoin {
   name: string;
@@ -28,20 +29,20 @@ const DEFAULT_STATE: GameState = {
 
 const DEMO_BALANCE = 500;
 
-const getStorageKey = (username: string) => `coinflip_state_${username}`;
+const getStorageKey = (uid: string) => `coinflip_state_${uid}`;
 
-function loadUserState(username: string): GameState {
-  const raw = localStorage.getItem(getStorageKey(username));
+function loadUserState(uid: string, displayName: string): GameState {
+  const raw = localStorage.getItem(getStorageKey(uid));
   if (raw) {
-    const parsed: GameState = { ...DEFAULT_STATE, ...JSON.parse(raw), username };
+    const parsed: GameState = { ...DEFAULT_STATE, ...JSON.parse(raw), username: displayName };
     if ((parsed.totalFlips || 0) === 0 && parsed.coinBalance < DEMO_BALANCE) {
       parsed.coinBalance = DEMO_BALANCE;
-      localStorage.setItem(getStorageKey(username), JSON.stringify(parsed));
+      localStorage.setItem(getStorageKey(uid), JSON.stringify(parsed));
     }
     return parsed;
   }
-  const fresh: GameState = { ...DEFAULT_STATE, username, coinBalance: DEMO_BALANCE };
-  localStorage.setItem(getStorageKey(username), JSON.stringify(fresh));
+  const fresh: GameState = { ...DEFAULT_STATE, username: displayName, coinBalance: DEMO_BALANCE };
+  localStorage.setItem(getStorageKey(uid), JSON.stringify(fresh));
   return fresh;
 }
 
@@ -60,30 +61,35 @@ interface GameStateCtx {
 const Ctx = createContext<GameStateCtx | null>(null);
 
 export function GameStateProvider({ children }: { children: React.ReactNode }) {
+  const { user, isLoaded: authLoaded, logOut } = useAuth();
   const [state, setState] = useState<GameState>(DEFAULT_STATE);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('coinflip_active_user');
-    if (stored) setState(loadUserState(stored));
+    if (!authLoaded) return;
+    if (user) {
+      const displayName = user.displayName || user.email?.split('@')[0] || 'Flipper';
+      setState(loadUserState(user.uid, displayName));
+    } else {
+      setState(DEFAULT_STATE);
+    }
     setIsLoaded(true);
+  }, [user, authLoaded]);
+
+  const persist = useCallback((next: GameState, uid: string) => {
+    localStorage.setItem(getStorageKey(uid), JSON.stringify(next));
   }, []);
 
-  const persist = useCallback((next: GameState) => {
-    if (next.username) localStorage.setItem(getStorageKey(next.username), JSON.stringify(next));
-  }, []);
+  // kept for interface compatibility — Firebase handles real login
+  const login = useCallback((_username: string) => {}, []);
 
-  const login = useCallback((username: string) => {
-    localStorage.setItem('coinflip_active_user', username);
-    setState(loadUserState(username));
-  }, []);
-
-  const logout = useCallback(() => {
-    localStorage.removeItem('coinflip_active_user');
+  const logout = useCallback(async () => {
+    await logOut();
     setState(DEFAULT_STATE);
-  }, []);
+  }, [logOut]);
 
   const addCoin = useCallback((coinName: string, packId?: PackId) => {
+    if (!user) return;
     setState(prev => {
       if (!prev.username) return prev;
       const existing = prev.collection.find(c => c.name === coinName);
@@ -99,12 +105,13 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
         recentPulls: [coinName, ...(prev.recentPulls || [])].slice(0, 20),
         ...(packId === 'daily' ? { lastFreeDailyTimestamp: Date.now() } : {}),
       };
-      localStorage.setItem(getStorageKey(next.username!), JSON.stringify(next));
+      persist(next, user.uid);
       return next;
     });
-  }, []);
+  }, [user, persist]);
 
   const addPackCoins = useCallback((coinNames: string[], packId?: PackId) => {
+    if (!user) return;
     setState(prev => {
       if (!prev.username) return prev;
       let newCollection = [...prev.collection];
@@ -125,21 +132,21 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
         recentPulls: [...coinNames, ...(prev.recentPulls || [])].slice(0, 20),
         ...(packId === 'daily' ? { lastFreeDailyTimestamp: Date.now() } : {}),
       };
-      localStorage.setItem(getStorageKey(next.username!), JSON.stringify(next));
+      persist(next, user.uid);
       return next;
     });
-  }, []);
+  }, [user, persist]);
 
   const payForFlip = useCallback((cost: number): boolean => {
-    if (state.coinBalance < cost) return false;
+    if (!user || state.coinBalance < cost) return false;
     setState(prev => {
       if (prev.coinBalance < cost) return prev;
       const next = { ...prev, coinBalance: prev.coinBalance - cost };
-      persist(next);
+      persist(next, user.uid);
       return next;
     });
     return true;
-  }, [state.coinBalance, persist]);
+  }, [user, state.coinBalance, persist]);
 
   const canFlipFree = useCallback((): boolean => {
     if (!state.lastFreeDailyTimestamp) return true;
