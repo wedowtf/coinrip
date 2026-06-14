@@ -17,36 +17,59 @@ function CoinLogo({ coin }: { coin: Coin }) {
   const meta = TIER_META[coin.tier as keyof typeof TIER_META];
 
   return (
-    <div
-      className="w-28 h-28 rounded-full flex items-center justify-center border-4 overflow-hidden relative"
-      style={{
-        borderColor: meta.color,
-        background: `radial-gradient(circle, ${meta.shadow}, transparent 70%)`,
-        boxShadow: `0 0 30px ${meta.shadow}`,
-      }}
-    >
-      {!imgError && coin.logoUrl ? (
-        <img
-          src={coin.logoUrl}
-          alt={coin.name}
-          className="w-20 h-20 object-contain"
-          onError={() => setImgError(true)}
-        />
-      ) : (
-        <span className="font-display font-black text-4xl" style={{ color: meta.color }}>
-          {coin.name.charAt(0)}
-        </span>
-      )}
+    <div className="relative flex items-center justify-center" style={{ width: 168, height: 168 }}>
+      {/* Outer slow-rotating dashed ring */}
+      <motion.div
+        className="absolute rounded-full border-2"
+        style={{ width: 166, height: 166, borderColor: meta.color + '55', borderStyle: 'dashed' }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+      />
+      {/* Middle counter-rotating ring */}
+      <motion.div
+        className="absolute rounded-full border"
+        style={{ width: 150, height: 150, borderColor: meta.color + '35' }}
+        animate={{ rotate: -360 }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+      />
+      {/* Pulsing volumetric glow */}
+      <motion.div
+        className="absolute rounded-full"
+        style={{ width: 138, height: 138 }}
+        animate={{
+          boxShadow: [
+            `0 0 20px ${meta.shadow}, 0 0 40px ${meta.shadow}60`,
+            `0 0 50px ${meta.shadow}, 0 0 90px ${meta.shadow}80`,
+            `0 0 20px ${meta.shadow}, 0 0 40px ${meta.shadow}60`,
+          ],
+        }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      {/* Coin circle */}
+      <div
+        className="w-28 h-28 rounded-full flex items-center justify-center border-4 overflow-hidden relative z-10"
+        style={{
+          borderColor: meta.color,
+          background: `radial-gradient(circle at 35% 35%, ${meta.color}35, ${meta.shadow} 55%, #0D0D14 100%)`,
+          boxShadow: `0 0 40px ${meta.shadow}, inset 0 0 20px ${meta.shadow}50`,
+        }}
+      >
+        {!imgError && coin.logoUrl ? (
+          <img src={coin.logoUrl} alt={coin.name} className="w-20 h-20 object-contain" onError={() => setImgError(true)} />
+        ) : (
+          <span className="font-display font-black text-4xl" style={{ color: meta.color }}>{coin.name.charAt(0)}</span>
+        )}
+      </div>
     </div>
   );
 }
 
 function Particle({ index, color }: { index: number; color: string }) {
-  const angle = (index / 24) * 360 + Math.random() * 15;
-  const dist = 90 + Math.random() * 140;
+  const angle = (index / 24) * 360 + Math.random() * 20;
+  const dist = 80 + Math.random() * 180;
   const x = Math.cos((angle * Math.PI) / 180) * dist;
   const y = Math.sin((angle * Math.PI) / 180) * dist;
-  const size = 3 + Math.random() * 5;
+  const size = 3 + Math.random() * 7;
 
   return (
     <motion.div
@@ -238,7 +261,7 @@ export default function Rip() {
           {/* Particle burst */}
           {showParticles && (
             <div className="absolute pointer-events-none z-40 top-1/2 left-1/2">
-              {Array.from({ length: isSpecial ? 28 : 14 }).map((_, i) => (
+              {Array.from({ length: isSingularity ? 48 : isSpecial ? 32 : 20 }).map((_, i) => (
                 <Particle key={i} index={i} color={particleColors[i % particleColors.length]} />
               ))}
             </div>
@@ -276,14 +299,28 @@ export default function Rip() {
           <motion.div
             className="w-full rounded-3xl border-2 p-6 flex flex-col items-center gap-4 relative overflow-hidden"
             style={{
-              borderColor: meta.color + '55',
-              background: `linear-gradient(145deg, ${meta.shadow}, #12121A 70%)`,
-              boxShadow: `0 8px 40px ${meta.shadow}`,
+              borderColor: meta.color + '70',
+              background: `linear-gradient(145deg, ${meta.color}18 0%, #12121A 50%, ${meta.shadow}08 100%)`,
+              boxShadow: `0 8px 40px ${meta.shadow}, 0 0 80px ${meta.shadow}40, inset 0 1px 0 rgba(255,255,255,0.1)`,
             }}
-            animate={isSingularity ? { boxShadow: [`0 8px 40px ${meta.shadow}`, `0 8px 60px ${meta.shadow}`, `0 8px 40px ${meta.shadow}`] } : {}}
+            animate={isSpecial ? {
+              boxShadow: [
+                `0 8px 40px ${meta.shadow}, 0 0 80px ${meta.shadow}40, inset 0 1px 0 rgba(255,255,255,0.1)`,
+                `0 8px 60px ${meta.shadow}, 0 0 120px ${meta.shadow}60, inset 0 1px 0 rgba(255,255,255,0.1)`,
+                `0 8px 40px ${meta.shadow}, 0 0 80px ${meta.shadow}40, inset 0 1px 0 rgba(255,255,255,0.1)`,
+              ]
+            } : {}}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/7 via-transparent to-black/30 pointer-events-none" />
+            {/* Coin card shimmer */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none rounded-3xl"
+              style={{ background: `linear-gradient(110deg, transparent 30%, ${meta.color}20 50%, transparent 70%)` }}
+              initial={{ x: '-100%' }}
+              animate={{ x: '200%' }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 2.5, ease: 'easeInOut' }}
+            />
 
             {/* Duplicate badge */}
             {alreadyOwned && (
@@ -317,13 +354,25 @@ export default function Rip() {
 
           {/* +2 COINS earned */}
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex items-center gap-1.5 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5"
+            initial={{ opacity: 0, scale: 0.7, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 18 }}
+            className="flex items-center gap-2 rounded-full px-5 py-2"
+            style={{
+              background: 'linear-gradient(135deg, rgba(226,255,0,0.15), rgba(226,255,0,0.05))',
+              border: '1px solid rgba(226,255,0,0.35)',
+              boxShadow: '0 0 20px rgba(226,255,0,0.15)',
+            }}
           >
-            <span className="text-primary font-black text-sm">+2</span>
-            <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider">COINS earned</span>
+            <motion.span
+              className="font-display font-black text-xl"
+              style={{ color: '#E2FF00', textShadow: '0 0 10px rgba(226,255,0,0.8)' }}
+              animate={{ scale: [1, 1.15, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              +2
+            </motion.span>
+            <span className="text-sm font-black text-zinc-300 uppercase tracking-widest">COINS EARNED 🪙</span>
           </motion.div>
 
           {/* Actions */}
@@ -333,19 +382,29 @@ export default function Rip() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               onClick={handleClaim}
-              className="w-full h-13 py-3.5 rounded-2xl font-display font-bold text-base uppercase tracking-wide active:scale-95 transition-transform"
-              style={{ background: meta.color, color: isSingularity || isPulsar ? '#000' : '#000' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              className="w-full py-4 rounded-2xl font-display font-black text-base uppercase tracking-wide relative overflow-hidden"
+              style={{
+                background: `linear-gradient(135deg, ${meta.color}, ${meta.color}BB)`,
+                color: '#000',
+                boxShadow: `0 4px 20px ${meta.shadow}, 0 0 40px ${meta.shadow}60`,
+              }}
             >
-              Add to Vault
+              <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+              ✦ Add to Vault
             </motion.button>
             <motion.button
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               onClick={handleRipAgain}
-              className="w-full py-3 rounded-2xl border border-border font-display font-bold text-sm uppercase tracking-wide text-muted-foreground active:scale-95 transition-transform"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.97 }}
+              className="w-full py-3 rounded-2xl font-display font-bold text-sm uppercase tracking-wide text-muted-foreground active:scale-95 transition-transform"
+              style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }}
             >
-              Back to Packs
+              ← Back to Packs
             </motion.button>
           </div>
         </motion.div>
