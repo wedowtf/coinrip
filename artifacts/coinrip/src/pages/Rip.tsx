@@ -60,7 +60,7 @@ function Particle({ index, color }: { index: number; color: string }) {
 }
 
 export default function Rip() {
-  const { state, addCoin } = useGameState();
+  const { state, addCoin, isLoaded } = useGameState();
   const [, setLocation] = useLocation();
   const search = useSearch();
   const params = new URLSearchParams(search);
@@ -71,12 +71,21 @@ export default function Rip() {
   const [revealedCoin, setRevealedCoin] = useState<Coin | null>(null);
   const [showParticles, setShowParticles] = useState(false);
   const claimed = useRef(false);
+  const ripStarted = useRef(false);
 
   useEffect(() => {
+    // CRITICAL: wait for localStorage to finish loading before checking username
+    if (!isLoaded) return;
+
     if (!state.username) {
       setLocation('/');
       return;
     }
+
+    // Only start the rip animation once
+    if (ripStarted.current) return;
+    ripStarted.current = true;
+
     const coin = getRandomCoinForPack(packId);
     setRevealedCoin(coin);
 
@@ -87,7 +96,7 @@ export default function Rip() {
     }, 2800);
 
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [state.username, setLocation, packId]);
+  }, [isLoaded, state.username, setLocation, packId]);
 
   const handleClaim = () => {
     if (revealedCoin && !claimed.current) {
@@ -98,13 +107,22 @@ export default function Rip() {
   };
 
   const handleRipAgain = () => {
-    if (pack.isFreeDaily) {
-      setLocation('/');
-    } else {
-      // Navigate back to home (user needs to click rip again from there)
-      setLocation('/');
-    }
+    setLocation('/');
   };
+
+  // Show loading spinner while state loads from localStorage
+  if (!isLoaded) {
+    return (
+      <div className="min-h-[80vh] flex flex-col items-center justify-center gap-4">
+        <motion.div
+          className="w-12 h-12 rounded-full border-4 border-primary/30 border-t-primary"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+        />
+        <p className="text-sm text-muted-foreground font-bold uppercase tracking-wider">Loading…</p>
+      </div>
+    );
+  }
 
   if (!revealedCoin) return <div className="min-h-screen bg-background" />;
 
