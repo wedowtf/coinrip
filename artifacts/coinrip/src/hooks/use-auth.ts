@@ -3,7 +3,8 @@ import {
   User,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   onAuthStateChanged,
   updateProfile,
@@ -29,19 +30,24 @@ function parseAuthError(error: AuthError): string {
     case "auth/user-not-found":
     case "auth/wrong-password":
     case "auth/invalid-credential":
-      return "Email atau password salah";
+      return "Incorrect email or password";
     case "auth/email-already-in-use":
-      return "Email sudah terdaftar";
+      return "Email is already registered";
     case "auth/weak-password":
-      return "Password minimal 6 karakter";
+      return "Password must be at least 6 characters";
     case "auth/invalid-email":
-      return "Format email tidak valid";
+      return "Invalid email address";
     case "auth/popup-closed-by-user":
-      return "Login dibatalkan";
+    case "auth/cancelled-popup-request":
+      return "Sign-in cancelled";
     case "auth/network-request-failed":
-      return "Koneksi gagal, coba lagi";
+      return "Network error, please try again";
+    case "auth/unauthorized-domain":
+      return "Domain not authorized — add this domain in Firebase Console";
+    case "auth/popup-blocked":
+      return "Popup blocked — redirecting to Google…";
     default:
-      return "Terjadi kesalahan, coba lagi";
+      return `Sign-in failed (${error.code})`;
   }
 }
 
@@ -51,6 +57,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
+    getRedirectResult(auth).catch(() => {});
+
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setIsLoaded(true);
@@ -85,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInGoogle = useCallback(async () => {
     try {
       setAuthError(null);
-      await signInWithPopup(auth, googleProvider);
+      await signInWithRedirect(auth, googleProvider);
     } catch (e) {
       setAuthError(parseAuthError(e as AuthError));
       throw e;
