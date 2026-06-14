@@ -62,10 +62,8 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     setGoogleLoading(true);
     try {
       await signInGoogle();
-      handleClose(false);
+      // page will redirect to Google — no need to close modal
     } catch {
-      // error handled in hook
-    } finally {
       setGoogleLoading(false);
     }
   };
@@ -104,7 +102,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   boxShadow: "0 0 12px rgba(226,255,0,0.15)",
                 } : { color: "rgba(255,255,255,0.4)" }}
               >
-                {t === "login" ? "Masuk" : "Daftar"}
+                {t === "login" ? "Sign In" : "Register"}
               </button>
             ))}
           </div>
@@ -117,12 +115,12 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
             className="relative z-10 w-full flex items-center justify-center gap-2.5 rounded-2xl border border-white/12 bg-white/6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20 mb-3"
           >
             {googleLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
-            Lanjutkan dengan Google
+            {googleLoading ? "Redirecting to Google…" : "Continue with Google"}
           </motion.button>
 
           <div className="relative z-10 flex items-center gap-3 mb-3">
             <div className="flex-1 h-px bg-white/8" />
-            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">atau</span>
+            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">or</span>
             <div className="flex-1 h-px bg-white/8" />
           </div>
 
@@ -134,7 +132,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   <div className="relative">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                     <Input
-                      placeholder="Nama tampilan"
+                      placeholder="Display name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="pl-10 bg-white/5 border-white/10 rounded-xl h-12 text-sm"
@@ -188,18 +186,18 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 className="w-full h-12 font-display font-bold text-sm uppercase bg-primary text-black hover:bg-primary/90 rounded-2xl"
                 style={{ boxShadow: "0 4px 24px rgba(226,255,0,0.4)" }}
               >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : tab === "login" ? "Masuk →" : "Buat Akun →"}
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : tab === "login" ? "Sign In →" : "Create Account →"}
               </Button>
             </motion.div>
           </form>
 
           <p className="relative z-10 text-center text-[10px] text-zinc-600 mt-3">
-            {tab === "login" ? "Belum punya akun? " : "Sudah punya akun? "}
+            {tab === "login" ? "Don't have an account? " : "Already have an account? "}
             <button
               onClick={() => { setTab(tab === "login" ? "register" : "login"); clearError(); }}
               className="text-primary/80 font-bold hover:text-primary transition-colors"
             >
-              {tab === "login" ? "Daftar sekarang" : "Masuk"}
+              {tab === "login" ? "Sign up now" : "Sign in"}
             </button>
           </p>
         </div>
