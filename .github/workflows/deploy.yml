@@ -42,12 +42,8 @@ jobs:
           PORT: "3000"
           BASE_PATH: /
           NODE_ENV: production
-          VITE_FIREBASE_API_KEY: "AIzaSyBWWxphPouvBF5BHcugNjX7Flj4_XG5zuE"
-          VITE_FIREBASE_AUTH_DOMAIN: "coinflip-23314.firebaseapp.com"
-          VITE_FIREBASE_PROJECT_ID: "coinflip-23314"
-          VITE_FIREBASE_STORAGE_BUCKET: "coinflip-23314.firebasestorage.app"
-          VITE_FIREBASE_MESSAGING_SENDER_ID: "551996530497"
-          VITE_FIREBASE_APP_ID: "1:551996530497:web:a74826eae27de3d76d8bc0"
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: pnpm run build
 
       - name: Upload Pages artifact
