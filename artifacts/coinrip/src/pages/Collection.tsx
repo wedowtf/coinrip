@@ -30,10 +30,12 @@ const TIER_META: Record<string, { color: string; label: string }> = {
 };
 
 export default function Collection() {
-  const { state } = useGameState();
+  const { state, isLoaded } = useGameState();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [redeemCoin, setRedeemCoin] = useState<string | null>(null);
+
+  if (!isLoaded) return <div className="min-h-[80vh]" />;
 
   if (!state.username) {
     return (
