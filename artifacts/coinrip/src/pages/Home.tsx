@@ -151,7 +151,7 @@ function PackCard({
             {/* barcode hint + brand */}
             <div className="absolute inset-0 flex items-center justify-between px-4">
               <span style={{ fontSize: 8, fontWeight: 900, letterSpacing: "0.3em", color: p.text + "99", textTransform: "uppercase" }}>
-                COINFLIP
+                COINRIP
               </span>
               {pack.badgeLabel && (
                 <span style={{
@@ -403,7 +403,7 @@ function PackCard({
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "linear-gradient(180deg, rgba(255,255,255,0.45), transparent)" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 100%)" }} />
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 8, fontWeight: 900, color: p.text + "80", textTransform: "uppercase", letterSpacing: "0.3em" }}>COINFLIP</span>
+              <span style={{ fontSize: 8, fontWeight: 900, color: p.text + "80", textTransform: "uppercase", letterSpacing: "0.3em" }}>COINRIP</span>
             </div>
           </div>
 
@@ -703,6 +703,12 @@ export default function Home() {
           </div>
         </div>
 
+        <div className="relative">
+          {/* Right-edge fade to hint more cards are scrollable */}
+          <div
+            className="absolute right-0 top-0 bottom-4 w-12 pointer-events-none z-10"
+            style={{ background: "linear-gradient(to left, #07070D 0%, transparent 100%)" }}
+          />
         <div
           className="flex overflow-x-auto gap-4 pb-4 -mx-6 px-6 snap-x snap-mandatory scrollbar-none"
           style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}
@@ -724,6 +730,7 @@ export default function Home() {
               />
             </motion.div>
           ))}
+        </div>
         </div>
       </div>
     </div>

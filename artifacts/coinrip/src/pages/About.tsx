@@ -26,10 +26,10 @@ export default function About() {
         transition={{ duration: 0.5 }}
       >
         <h1 className="text-4xl font-display font-extrabold uppercase italic tracking-tighter text-primary sticker-shadow">
-          About CoinFlip
+          About CoinRip
         </h1>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
-          CoinFlip is the pack-flipping game for the <strong className="text-white">Orynth ecosystem</strong> — 
+          CoinRip is the pack-ripping game for the <strong className="text-white">Orynth ecosystem</strong> — 
           real products, real market caps, collectible rarity.
         </p>
       </motion.div>
@@ -37,11 +37,11 @@ export default function About() {
       {/* What is it */}
       <div className="space-y-3">
         <h2 className="font-display text-base font-black uppercase tracking-widest text-white flex items-center gap-2">
-          <Package className="w-4 h-4 text-primary" /> What is CoinFlip?
+          <Package className="w-4 h-4 text-primary" /> What is CoinRip?
         </h2>
         <div className="bg-secondary/30 border border-border rounded-2xl p-4 space-y-3 text-sm text-zinc-300 leading-relaxed">
           <p>
-            CoinFlip turns <strong className="text-white">orynth.dev</strong> — a marketplace where products find their first users — into a collectible card game.
+            CoinRip turns <strong className="text-white">orynth.dev</strong> — a marketplace where products find their first users — into a collectible card game.
           </p>
           <p>
             Every product listed on Orynth has a real market cap. That market cap determines its <strong className="text-white">rarity tier</strong>. 
@@ -157,12 +157,12 @@ export default function About() {
       <div className="flex flex-col items-center gap-3">
         <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold">Featured on</p>
         <a
-          href="https://orynth.dev/projects/coinflip"
+          href="https://orynth.dev/projects/coinrip"
           target="_blank"
           rel="noopener noreferrer"
         >
           <img
-            src="https://orynth.dev/api/badge/coinflip?theme=light&style=default"
+            src="https://orynth.dev/api/badge/coinrip?theme=light&style=default"
             alt="Featured on Orynth"
             width="260"
             height="80"

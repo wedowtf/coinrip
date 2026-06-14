@@ -51,7 +51,7 @@ function CoinCard({
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: "linear-gradient(180deg, rgba(255,255,255,0.40), transparent)" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.16) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.16) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: 6, fontWeight: 900, color: p.text + "70", textTransform: "uppercase", letterSpacing: "0.28em" }}>COINFLIP</span>
+          <span style={{ fontSize: 6, fontWeight: 900, color: p.text + "70", textTransform: "uppercase", letterSpacing: "0.28em" }}>COINRIP</span>
         </div>
       </div>
 

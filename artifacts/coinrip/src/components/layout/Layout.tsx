@@ -51,7 +51,7 @@ import { useGameState } from "@/hooks/use-game-state";
               <Logo className="w-8 h-8 sticker-shadow" />
             </motion.div>
             <span className="font-display font-black text-xl tracking-tight" style={{ textShadow: '0 0 20px rgba(226,255,0,0.3)' }}>
-              CoinFlip
+              CoinRip
             </span>
           </Link>
 
@@ -124,12 +124,13 @@ import { useGameState } from "@/hooks/use-game-state";
 
         {/* ─── Bottom Nav ─── */}
         <nav
-          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md flex items-center justify-around py-2 px-2 z-50"
+          className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md flex items-center justify-around pt-2 px-2 z-50"
           style={{
             background: 'rgba(5,5,10,0.92)',
             backdropFilter: 'blur(28px)',
             borderTop: '1px solid rgba(255,255,255,0.06)',
             boxShadow: '0 -4px 40px rgba(0,0,0,0.7), 0 -1px 0 rgba(226,255,0,0.06)',
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
           }}
         >
           <div

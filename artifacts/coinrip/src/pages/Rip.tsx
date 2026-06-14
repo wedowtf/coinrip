@@ -90,7 +90,7 @@ function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: 
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <span style={{ fontSize: 7, fontWeight: 900, color: p.text + "80", textTransform: "uppercase", letterSpacing: "0.25em" }}>
-            COINFLIP
+            COINRIP
           </span>
         </div>
       </div>
@@ -265,7 +265,7 @@ function PhysicalPack({ pack, stage }: { pack: typeof PACKS[0]; stage: "shaking"
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "linear-gradient(180deg, rgba(255,255,255,0.45), transparent)" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px" }}>
-          <span style={{ fontSize: 8, fontWeight: 900, color: p.text + "88", textTransform: "uppercase", letterSpacing: "0.3em" }}>COINFLIP</span>
+          <span style={{ fontSize: 8, fontWeight: 900, color: p.text + "88", textTransform: "uppercase", letterSpacing: "0.3em" }}>COINRIP</span>
           {pack.badgeLabel && (
             <span style={{ fontSize: 7, fontWeight: 900, background: p.text, color: p.bg, padding: "2px 6px", borderRadius: 99, textTransform: "uppercase" }}>{pack.badgeLabel}</span>
           )}
@@ -460,14 +460,6 @@ export default function Rip() {
   }
 
   /* ── Reveal ── */
-  const bestCoin = revealedCoins.reduce((best, coin) =>
-    (TIER_PASTEL[coin.tier as keyof typeof TIER_PASTEL]?.glow?.length ?? 0) >
-    (TIER_PASTEL[best.tier as keyof typeof TIER_PASTEL]?.glow?.length ?? 0)
-      ? coin
-      : best,
-    revealedCoins[0]
-  );
-  /* More accurate best: use tier order */
   const tierOrder: Record<string, number> = { SINGULARITY: 5, PULSAR: 4, NOVA: 3, FLARE: 2, SPARK: 1 };
   const actualBest = revealedCoins.reduce((b, c) => (tierOrder[c.tier] ?? 0) > (tierOrder[b.tier] ?? 0) ? c : b, revealedCoins[0]);
 
