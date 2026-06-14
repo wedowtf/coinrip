@@ -1,7 +1,7 @@
 import { useGameState } from "@/hooks/use-game-state";
   import { Link, useLocation } from "wouter";
   import { Logo } from "@/components/ui/Logo";
-  import { PackageOpen, LayoutGrid, UserCircle, Info } from "lucide-react";
+  import { PackageOpen, LayoutGrid, UserCircle, Info, Trophy } from "lucide-react";
   import { useState } from "react";
   import { Button } from "@/components/ui/button";
   import { motion } from "framer-motion";
@@ -19,6 +19,7 @@ import { useGameState } from "@/hooks/use-game-state";
     const navItems = [
       { href: '/', icon: <PackageOpen className="w-5 h-5" />, label: 'Packs' },
       { href: '/collection', icon: <LayoutGrid className="w-5 h-5" />, label: 'Vault' },
+      { href: '/leaderboard', icon: <Trophy className="w-5 h-5" />, label: 'Top' },
       { href: '/about', icon: <Info className="w-5 h-5" />, label: 'About' },
     ];
 

@@ -26,6 +26,19 @@ export interface FlipResult {
   lastFreeDailyTimestamp: number | null;
 }
 
+export interface LeaderboardEntry {
+  rank: number;
+  username: string;
+  totalFlips: number;
+  uniqueCoins: number;
+  totalCoins: number;
+  coinBalance: number;
+}
+
+export interface LeaderboardResponse {
+  entries: LeaderboardEntry[];
+}
+
 async function apiFetch<T>(
   path: string,
   token: string,
@@ -46,6 +59,15 @@ async function apiFetch<T>(
   return res.json() as Promise<T>;
 }
 
+async function publicFetch<T>(path: string): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    throw new Error((body as { error?: string }).error ?? `HTTP ${res.status}`);
+  }
+  return res.json() as Promise<T>;
+}
+
 export const apiClient = {
   getState: (token: string): Promise<GameStateResponse> =>
     apiFetch<GameStateResponse>('/game/state', token),
@@ -55,4 +77,7 @@ export const apiClient = {
       method: 'POST',
       body: JSON.stringify({ packId }),
     }),
+
+  getLeaderboard: (limit = 20): Promise<LeaderboardResponse> =>
+    publicFetch<LeaderboardResponse>(`/game/leaderboard?limit=${limit}`),
 };
