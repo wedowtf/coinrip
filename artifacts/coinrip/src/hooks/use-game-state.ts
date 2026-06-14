@@ -45,7 +45,7 @@ export function useGameState() {
       if (storedState) {
         setState({ ...DEFAULT_STATE, ...JSON.parse(storedState), username: activeUser });
       } else {
-        const newState: GameState = { ...DEFAULT_STATE, username: activeUser, coinBalance: 0 };
+        const newState: GameState = { ...DEFAULT_STATE, username: activeUser, coinBalance: 50 };
         localStorage.setItem(getStorageKey(activeUser), JSON.stringify(newState));
         setState(newState);
       }
