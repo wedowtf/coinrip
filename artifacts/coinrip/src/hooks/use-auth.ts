@@ -1,112 +1,100 @@
 import React, { useState, useEffect, useCallback, useContext, createContext } from "react";
-import {
-  User,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithRedirect,
-  getRedirectResult,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-  AuthError,
-} from "firebase/auth";
-import { auth, googleProvider } from "@/lib/firebase";
+import type { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
 interface AuthCtx {
   user: User | null;
+  session: Session | null;
   isLoaded: boolean;
   signInEmail: (email: string, password: string) => Promise<void>;
   signUpEmail: (email: string, password: string, displayName: string) => Promise<void>;
   signInGoogle: () => Promise<void>;
+  signInMagicLink: (email: string) => Promise<void>;
   logOut: () => Promise<void>;
   authError: string | null;
+  magicLinkSent: boolean;
   clearError: () => void;
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
 
-function parseAuthError(error: AuthError): string {
-  switch (error.code) {
-    case "auth/user-not-found":
-    case "auth/wrong-password":
-    case "auth/invalid-credential":
-      return "Incorrect email or password";
-    case "auth/email-already-in-use":
-      return "Email is already registered";
-    case "auth/weak-password":
-      return "Password must be at least 6 characters";
-    case "auth/invalid-email":
-      return "Invalid email address";
-    case "auth/popup-closed-by-user":
-    case "auth/cancelled-popup-request":
-      return "Sign-in cancelled";
-    case "auth/network-request-failed":
-      return "Network error, please try again";
-    case "auth/unauthorized-domain":
-      return "Domain not authorized — add this domain in Firebase Console";
-    case "auth/popup-blocked":
-      return "Popup blocked — redirecting to Google…";
-    default:
-      return `Sign-in failed (${error.code})`;
-  }
+function parseError(msg: string): string {
+  if (msg.includes("Invalid login credentials")) return "Incorrect email or password";
+  if (msg.includes("Email not confirmed")) return "Please verify your email first";
+  if (msg.includes("User already registered")) return "Email is already registered";
+  if (msg.includes("Password should be at least")) return "Password must be at least 6 characters";
+  if (msg.includes("Unable to validate email")) return "Invalid email address";
+  if (msg.includes("Email rate limit exceeded")) return "Too many attempts — use Magic Link instead";
+  if (msg.includes("over_email_send_rate_limit")) return "Too many attempts — use Magic Link instead";
+  return msg || "Sign-in failed, please try again";
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
   useEffect(() => {
-    getRedirectResult(auth).catch(() => {});
-
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
       setIsLoaded(true);
     });
-    return unsub;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoaded(true);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
-  const clearError = useCallback(() => setAuthError(null), []);
+  const clearError = useCallback(() => { setAuthError(null); setMagicLinkSent(false); }, []);
 
   const signInEmail = useCallback(async (email: string, password: string) => {
-    try {
-      setAuthError(null);
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (e) {
-      setAuthError(parseAuthError(e as AuthError));
-      throw e;
-    }
+    setAuthError(null);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) { setAuthError(parseError(error.message)); throw error; }
   }, []);
 
   const signUpEmail = useCallback(async (email: string, password: string, displayName: string) => {
-    try {
-      setAuthError(null);
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(cred.user, { displayName: displayName.trim() || email.split("@")[0] });
-      setUser({ ...cred.user, displayName: displayName.trim() || email.split("@")[0] } as User);
-    } catch (e) {
-      setAuthError(parseAuthError(e as AuthError));
-      throw e;
-    }
+    setAuthError(null);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: displayName.trim() || email.split("@")[0] } },
+    });
+    if (error) { setAuthError(parseError(error.message)); throw error; }
   }, []);
 
   const signInGoogle = useCallback(async () => {
-    try {
-      setAuthError(null);
-      await signInWithRedirect(auth, googleProvider);
-    } catch (e) {
-      setAuthError(parseAuthError(e as AuthError));
-      throw e;
-    }
+    setAuthError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) { setAuthError(parseError(error.message)); throw error; }
+  }, []);
+
+  const signInMagicLink = useCallback(async (email: string) => {
+    setAuthError(null);
+    setMagicLinkSent(false);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true },
+    });
+    if (error) { setAuthError(parseError(error.message)); throw error; }
+    setMagicLinkSent(true);
   }, []);
 
   const logOut = useCallback(async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
   }, []);
 
   return React.createElement(
     Ctx.Provider,
-    { value: { user, isLoaded, signInEmail, signUpEmail, signInGoogle, logOut, authError, clearError } },
+    { value: { user, session, isLoaded, signInEmail, signUpEmail, signInGoogle, signInMagicLink, logOut, authError, magicLinkSent, clearError } },
     children
   );
 }
@@ -116,3 +104,4 @@ export function useAuth(): AuthCtx {
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }
+
