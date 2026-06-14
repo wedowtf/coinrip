@@ -17,15 +17,18 @@ const Ctx = createContext<AuthCtx | null>(null);
 
 function parseError(msg: string): string {
   if (msg.includes("Error sending confirmation email") || msg.includes("sending confirmation"))
-    return "Gagal kirim email — coba lagi dalam beberapa menit";
+    return "Failed to send email — our email service is temporarily unavailable. Please try again in a few minutes.";
   if (msg.includes("Email rate limit exceeded") || msg.includes("over_email_send_rate_limit"))
-    return "Terlalu banyak percobaan — tunggu beberapa menit lalu coba lagi";
-  if (msg.includes("For security purposes")) return "Tunggu sebentar sebelum mencoba lagi";
+    return "Too many attempts — please wait a few minutes and try again.";
+  if (msg.includes("For security purposes"))
+    return "Please wait a moment before trying again.";
   if (msg.includes("Unable to validate email") || msg.includes("invalid email"))
-    return "Format email tidak valid";
+    return "Please enter a valid email address.";
   if (msg.includes("signup_disabled") || msg.includes("Signups not allowed"))
-    return "Pendaftaran sementara dinonaktifkan";
-  return msg || "Gagal mengirim magic link, coba lagi";
+    return "Sign-ups are temporarily disabled.";
+  if (msg.includes("unexpected_failure"))
+    return "Email delivery failed — please try again shortly.";
+  return msg || "Failed to send magic link. Please try again.";
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
