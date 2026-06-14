@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useGameState } from "@/hooks/use-game-state";
-import { getRandomCoinForPack, Coin, PackId, PACKS } from "@/lib/dataset";
+import { COINS, Coin, PackId, PACKS } from "@/lib/dataset";
 import { useLocation, useSearch } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -321,7 +321,7 @@ function PhysicalPack({ pack, stage }: { pack: typeof PACKS[0]; stage: "shaking"
    Main Rip page
 ══════════════════════════════════════════════ */
 export default function Rip() {
-  const { state, addPackCoins, isLoaded } = useGameState();
+  const { state, flipPack, isLoaded } = useGameState();
   const [, setLocation] = useLocation();
   const search = useSearch();
   const params = new URLSearchParams(search);
@@ -333,6 +333,7 @@ export default function Rip() {
   const [revealedCoins, setRevealedCoins] = useState<Coin[]>([]);
   const [showParticles, setShowParticles] = useState(false);
   const [screenFlash, setScreenFlash] = useState(false);
+  const [flipError, setFlipError] = useState<string | null>(null);
   const claimed = useRef(false);
   const ripStarted = useRef(false);
 
@@ -342,8 +343,19 @@ export default function Rip() {
     if (ripStarted.current) return;
     ripStarted.current = true;
 
-    const coins = Array.from({ length: PACK_COINS }, () => getRandomCoinForPack(packId));
-    setRevealedCoins(coins);
+    // Start server flip and animation simultaneously for zero perceived latency
+    flipPack(packId)
+      .then(result => {
+        const fullCoins = result.coins.map(sc => {
+          const coin = COINS.find(c => c.name === sc.name);
+          return coin ?? {
+            name: sc.name, ticker: sc.ticker, tier: sc.tier as Coin["tier"],
+            tagline: "", marketCap: 0, logoUrl: "", category: "",
+          };
+        });
+        setRevealedCoins(fullCoins);
+      })
+      .catch(err => setFlipError((err as Error).message ?? "Flip failed"));
 
     const t1 = setTimeout(() => setStage("tearing"), 1600);
     const t2 = setTimeout(() => {
@@ -354,12 +366,11 @@ export default function Rip() {
     }, 3000);
 
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [isLoaded, state.username, setLocation, packId]);
+  }, [isLoaded, state.username, setLocation, packId, flipPack]);
 
   const handleClaim = () => {
-    if (revealedCoins.length && !claimed.current) {
+    if (!claimed.current) {
       claimed.current = true;
-      addPackCoins(revealedCoins.map(c => c.name), packId);
       setLocation("/collection");
     }
   };
@@ -371,6 +382,21 @@ export default function Rip() {
           style={{ borderColor: "rgba(226,255,0,0.25)", borderTopColor: "#E2FF00" }}
           animate={{ rotate: 360 }} transition={{ duration: 0.7, repeat: Infinity, ease: "linear" }} />
         <p className="text-sm text-muted-foreground font-bold uppercase tracking-wider">Loading…</p>
+      </div>
+    );
+  }
+
+  if (flipError) {
+    return (
+      <div className="min-h-[80vh] flex flex-col items-center justify-center gap-4 px-6 text-center">
+        <div className="text-4xl">⚠️</div>
+        <p className="font-display font-black text-lg uppercase text-white">Flip Failed</p>
+        <p className="text-sm text-zinc-400 max-w-xs">{flipError}</p>
+        <button
+          onClick={() => setLocation("/")}
+          className="mt-2 px-6 py-3 rounded-2xl font-bold text-sm uppercase tracking-wide"
+          style={{ background: "rgba(226,255,0,0.12)", border: "1px solid rgba(226,255,0,0.28)", color: "#E2FF00" }}
+        >← Back to Packs</button>
       </div>
     );
   }
