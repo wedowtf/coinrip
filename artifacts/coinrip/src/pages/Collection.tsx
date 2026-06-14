@@ -51,7 +51,7 @@ function CoinCard({
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: "linear-gradient(180deg, rgba(255,255,255,0.40), transparent)" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.16) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.16) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: 6, fontWeight: 900, color: p.text + "70", textTransform: "uppercase", letterSpacing: "0.28em" }}>COINRIP</span>
+          <span style={{ fontSize: 6, fontWeight: 900, color: p.text + "70", textTransform: "uppercase", letterSpacing: "0.28em" }}>COINFLIP</span>
         </div>
       </div>
 
@@ -345,7 +345,7 @@ export default function Collection() {
           </motion.div>
           <div className="space-y-1">
             <p className="font-display font-bold text-white text-lg">Vault is empty</p>
-            <p className="text-sm text-zinc-500">Go rip some packs to fill it up!</p>
+            <p className="text-sm text-zinc-500">Go flip some packs to fill it up!</p>
           </div>
         </motion.div>
       ) : (
