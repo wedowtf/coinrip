@@ -584,55 +584,54 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-5 pb-4">
 
-      {/* Hero */}
-      <div className="relative overflow-hidden px-6 pt-7 pb-3">
+      {/* Hero — ambient glow + tagline only (no repeated title) */}
+      <div className="relative overflow-hidden px-6 pt-5 pb-2">
+        {/* Ambient orbs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <motion.div className="absolute -top-14 -left-14 w-56 h-56 rounded-full blur-3xl"
+          <motion.div className="absolute -top-10 -left-10 w-48 h-48 rounded-full blur-3xl"
             style={{ background: "#E2FF00" }}
-            animate={{ scale: [1, 1.2, 1], opacity: [0.12, 0.20, 0.12] }}
-            transition={{ duration: 4.5, repeat: Infinity }} />
-          <motion.div className="absolute -top-8 -right-10 w-44 h-44 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.18, 1], opacity: [0.10, 0.18, 0.10] }}
+            transition={{ duration: 5, repeat: Infinity }} />
+          <motion.div className="absolute -top-6 -right-8 w-36 h-36 rounded-full blur-3xl"
             style={{ background: "#D946EF" }}
-            animate={{ scale: [1.1, 0.85, 1.1], opacity: [0.08, 0.16, 0.08] }}
-            transition={{ duration: 5.5, repeat: Infinity, delay: 1 }} />
+            animate={{ scale: [1.1, 0.82, 1.1], opacity: [0.06, 0.13, 0.06] }}
+            transition={{ duration: 6, repeat: Infinity, delay: 1.2 }} />
         </div>
-        <motion.div className="text-center space-y-2 relative z-10"
-          initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
-          <motion.h1
-            className="text-6xl font-display font-extrabold uppercase italic tracking-tighter"
-            style={{ color: "#E2FF00", textShadow: "0 0 40px rgba(226,255,0,0.5), 0 2px 0 rgba(0,0,0,0.9)" }}
-            animate={{ textShadow: [
-              "0 0 40px rgba(226,255,0,0.4), 0 2px 0 rgba(0,0,0,0.9)",
-              "0 0 70px rgba(226,255,0,0.75), 0 2px 0 rgba(0,0,0,0.9)",
-              "0 0 40px rgba(226,255,0,0.4), 0 2px 0 rgba(0,0,0,0.9)",
-            ] }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >CoinRip</motion.h1>
-          <motion.p className="text-sm text-zinc-400 font-medium"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+
+        <motion.div className="relative z-10 space-y-2"
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+
+          {/* Tagline */}
+          <motion.p
+            className="text-sm font-medium"
+            style={{ color: "rgba(226,255,0,0.75)" }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
             Rip packs · 6 real coins each · Collect &amp; redeem
           </motion.p>
+
+          {/* Notification toasts */}
           <AnimatePresence>
             {showNeedLogin && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.88, y: -8 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0 }}
+                initial={{ opacity: 0, scale: 0.88, y: -6 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92 }}
                 className="inline-flex items-center gap-1.5 text-xs text-black font-black py-1.5 px-4 rounded-full"
                 style={{ background: "#E2FF00", boxShadow: "0 0 20px rgba(226,255,0,0.5)" }}
               >↑ Log in to start ripping packs</motion.div>
             )}
             {showInsufficient && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 className="inline-flex items-center gap-1.5 text-xs text-white font-bold py-1.5 px-4 rounded-full"
-                style={{ background: "rgba(239,68,68,0.2)", border: "1px solid rgba(239,68,68,0.3)" }}
+                style={{ background: "rgba(239,68,68,0.20)", border: "1px solid rgba(239,68,68,0.32)" }}
               >{showInsufficient}</motion.div>
             )}
           </AnimatePresence>
+
           {!state.username && !showNeedLogin && (
-            <motion.p className="text-xs text-zinc-600 font-medium"
-              animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2.5, repeat: Infinity }}>
+            <motion.p className="text-[11px] text-zinc-600 font-medium"
+              animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2.8, repeat: Infinity }}>
               Press LOGIN ↑ · get 500 free demo coins
             </motion.p>
           )}
