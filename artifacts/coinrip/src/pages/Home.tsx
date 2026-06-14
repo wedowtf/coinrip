@@ -68,13 +68,13 @@ const H = 430;
 const CRIMP = 30;
 
 function PackCard({
-  pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequired,
+  pack, canAfford, canFlipFree, timeLeft, onRip, onLoginRequired,
 }: {
-  pack: PackDef; canAfford: boolean; canRipFree: boolean;
+  pack: PackDef; canAfford: boolean; canFlipFree: boolean;
   timeLeft: string | null; onRip: () => void; onLoginRequired: () => void;
 }) {
   const isFree = pack.isFreeDaily;
-  const isAvailable = isFree ? canRipFree : canAfford;
+  const isAvailable = isFree ? canFlipFree : canAfford;
   const [previewCoins] = useState(() => getPreviewCoins(pack));
   const [isFlipped, setIsFlipped] = useState(false);
   const p = PKG[pack.id];
@@ -151,7 +151,7 @@ function PackCard({
             {/* barcode hint + brand */}
             <div className="absolute inset-0 flex items-center justify-between px-4">
               <span style={{ fontSize: 8, fontWeight: 900, letterSpacing: "0.3em", color: p.text + "99", textTransform: "uppercase" }}>
-                COINRIP
+                COINFLIP
               </span>
               {pack.badgeLabel && (
                 <span style={{
@@ -336,9 +336,9 @@ function PackCard({
                   />
                 )}
                 {isFree
-                  ? isAvailable ? <>🎁 RIP FREE · 6 COINS</> : <>⏳ {timeLeft ?? "Tomorrow"}</>
+                  ? isAvailable ? <>🎁 FLIP FREE · 6 COINS</> : <>⏳ {timeLeft ?? "Tomorrow"}</>
                   : isAvailable
-                  ? <>⚡ RIP · {pack.cost} 🪙</>
+                  ? <>⚡ FLIP · {pack.cost} 🪙</>
                   : <>🔒 {pack.cost} COINS</>
                 }
               </motion.button>
@@ -403,7 +403,7 @@ function PackCard({
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "linear-gradient(180deg, rgba(255,255,255,0.45), transparent)" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 100%)" }} />
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 8, fontWeight: 900, color: p.text + "80", textTransform: "uppercase", letterSpacing: "0.3em" }}>COINRIP</span>
+              <span style={{ fontSize: 8, fontWeight: 900, color: p.text + "80", textTransform: "uppercase", letterSpacing: "0.3em" }}>COINFLIP</span>
             </div>
           </div>
 
@@ -546,14 +546,14 @@ function PackCard({
 
 /* ─────────────────── page ─────────────────── */
 export default function Home() {
-  const { state, canRipFree, getTimeUntilFreeRip, payForRip } = useGameState();
+  const { state, canFlipFree, getTimeUntilFreeFlip, payForFlip } = useGameState();
   const [, setLocation] = useLocation();
   const [showNeedLogin, setShowNeedLogin] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showInsufficient, setShowInsufficient] = useState<string | null>(null);
 
-  const timeLeft = getTimeUntilFreeRip();
-  const isNewUser = state.username && (state.totalRips || 0) === 0;
+  const timeLeft = getTimeUntilFreeFlip();
+  const isNewUser = state.username && (state.totalFlips || 0) === 0;
 
   useEffect(() => {
     if (isNewUser) {
@@ -570,13 +570,13 @@ export default function Home() {
       return;
     }
     if (pack.isFreeDaily) {
-      if (canRipFree()) setLocation(`/rip?pack=${pack.id}`);
+      if (canFlipFree()) setLocation(`/rip?pack=${pack.id}`);
       return;
     }
-    if (payForRip(pack.cost)) {
+    if (payForFlip(pack.cost)) {
       setLocation(`/rip?pack=${pack.id}`);
     } else {
-      setShowInsufficient(`Need ${pack.cost} coins — rip packs to earn more!`);
+      setShowInsufficient(`Need ${pack.cost} coins — flip packs to earn more!`);
       setTimeout(() => setShowInsufficient(null), 3000);
     }
   };
@@ -606,7 +606,7 @@ export default function Home() {
             className="text-sm font-medium"
             style={{ color: "rgba(226,255,0,0.75)" }}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
-            Rip packs · 6 real coins each · Collect &amp; redeem
+            Flip packs · 6 real coins each · Collect &amp; redeem
           </motion.p>
 
           {/* Notification toasts */}
@@ -617,7 +617,7 @@ export default function Home() {
                 exit={{ opacity: 0, scale: 0.92 }}
                 className="inline-flex items-center gap-1.5 text-xs text-black font-black py-1.5 px-4 rounded-full"
                 style={{ background: "#E2FF00", boxShadow: "0 0 20px rgba(226,255,0,0.5)" }}
-              >↑ Log in to start ripping packs</motion.div>
+              >↑ Log in to start flipping packs</motion.div>
             )}
             {showInsufficient && (
               <motion.div
@@ -669,7 +669,7 @@ export default function Home() {
       {state.username && (
         <div className="flex gap-2 px-6">
           {[
-            { label: "Rips",   value: state.totalRips || 0,   accent: "#E2E8F0", icon: "🎴" },
+            { label: "Flips",  value: state.totalFlips || 0,  accent: "#E2E8F0", icon: "🎴" },
             { label: "Unique", value: state.collection.length, accent: "#06B6D4", icon: "💎" },
             { label: "COINS",  value: state.coinBalance,       accent: "#E2FF00", icon: "🪙" },
           ].map((s, i) => (
@@ -714,7 +714,7 @@ export default function Home() {
               <PackCard
                 pack={pack}
                 canAfford={state.coinBalance >= pack.cost}
-                canRipFree={canRipFree()}
+                canFlipFree={canFlipFree()}
                 timeLeft={timeLeft}
                 onRip={() => handleRip(pack)}
                 onLoginRequired={() => {
