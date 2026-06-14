@@ -9,33 +9,32 @@ export interface OwnedCoin {
 export interface GameState {
   username: string | null;
   coinBalance: number;
-  lastRipTimestamp: number | null;
+  lastFlipTimestamp: number | null;
   lastFreeDailyTimestamp: number | null;
   recentPulls: string[];
   collection: OwnedCoin[];
-  totalRips: number;
+  totalFlips: number;
 }
 
 const DEFAULT_STATE: GameState = {
   username: null,
   coinBalance: 0,
-  lastRipTimestamp: null,
+  lastFlipTimestamp: null,
   lastFreeDailyTimestamp: null,
   recentPulls: [],
   collection: [],
-  totalRips: 0,
+  totalFlips: 0,
 };
 
 const DEMO_BALANCE = 500;
 
-const getStorageKey = (username: string) => `coinrip_state_${username}`;
+const getStorageKey = (username: string) => `coinflip_state_${username}`;
 
 function loadUserState(username: string): GameState {
   const raw = localStorage.getItem(getStorageKey(username));
   if (raw) {
     const parsed: GameState = { ...DEFAULT_STATE, ...JSON.parse(raw), username };
-    // Demo top-up: users who haven't ripped yet always get full demo balance
-    if ((parsed.totalRips || 0) === 0 && parsed.coinBalance < DEMO_BALANCE) {
+    if ((parsed.totalFlips || 0) === 0 && parsed.coinBalance < DEMO_BALANCE) {
       parsed.coinBalance = DEMO_BALANCE;
       localStorage.setItem(getStorageKey(username), JSON.stringify(parsed));
     }
@@ -53,9 +52,9 @@ interface GameStateCtx {
   logout: () => void;
   addCoin: (coinName: string, packId?: PackId) => void;
   addPackCoins: (coinNames: string[], packId?: PackId) => void;
-  canRipFree: () => boolean;
-  getTimeUntilFreeRip: () => string | null;
-  payForRip: (cost: number) => boolean;
+  canFlipFree: () => boolean;
+  getTimeUntilFreeFlip: () => string | null;
+  payForFlip: (cost: number) => boolean;
 }
 
 const Ctx = createContext<GameStateCtx | null>(null);
@@ -65,7 +64,7 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('coinrip_active_user');
+    const stored = localStorage.getItem('coinflip_active_user');
     if (stored) setState(loadUserState(stored));
     setIsLoaded(true);
   }, []);
@@ -75,12 +74,12 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback((username: string) => {
-    localStorage.setItem('coinrip_active_user', username);
+    localStorage.setItem('coinflip_active_user', username);
     setState(loadUserState(username));
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('coinrip_active_user');
+    localStorage.removeItem('coinflip_active_user');
     setState(DEFAULT_STATE);
   }, []);
 
@@ -95,8 +94,8 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
         ...prev,
         collection: newCollection,
         coinBalance: prev.coinBalance + 2,
-        lastRipTimestamp: Date.now(),
-        totalRips: (prev.totalRips || 0) + 1,
+        lastFlipTimestamp: Date.now(),
+        totalFlips: (prev.totalFlips || 0) + 1,
         recentPulls: [coinName, ...(prev.recentPulls || [])].slice(0, 20),
         ...(packId === 'daily' ? { lastFreeDailyTimestamp: Date.now() } : {}),
       };
@@ -121,8 +120,8 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
         ...prev,
         collection: newCollection,
         coinBalance: prev.coinBalance + coinNames.length * 2,
-        lastRipTimestamp: Date.now(),
-        totalRips: (prev.totalRips || 0) + 1,
+        lastFlipTimestamp: Date.now(),
+        totalFlips: (prev.totalFlips || 0) + 1,
         recentPulls: [...coinNames, ...(prev.recentPulls || [])].slice(0, 20),
         ...(packId === 'daily' ? { lastFreeDailyTimestamp: Date.now() } : {}),
       };
@@ -131,7 +130,7 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const payForRip = useCallback((cost: number): boolean => {
+  const payForFlip = useCallback((cost: number): boolean => {
     if (state.coinBalance < cost) return false;
     setState(prev => {
       if (prev.coinBalance < cost) return prev;
@@ -142,12 +141,12 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, [state.coinBalance, persist]);
 
-  const canRipFree = useCallback((): boolean => {
+  const canFlipFree = useCallback((): boolean => {
     if (!state.lastFreeDailyTimestamp) return true;
     return Date.now() - state.lastFreeDailyTimestamp > 24 * 60 * 60 * 1000;
   }, [state.lastFreeDailyTimestamp]);
 
-  const getTimeUntilFreeRip = useCallback((): string | null => {
+  const getTimeUntilFreeFlip = useCallback((): string | null => {
     if (!state.lastFreeDailyTimestamp) return null;
     const diff = 24 * 60 * 60 * 1000 - (Date.now() - state.lastFreeDailyTimestamp);
     if (diff <= 0) return null;
@@ -158,7 +157,7 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
 
   return React.createElement(
     Ctx.Provider,
-    { value: { state, isLoaded, login, logout, addCoin, addPackCoins, canRipFree, getTimeUntilFreeRip, payForRip } },
+    { value: { state, isLoaded, login, logout, addCoin, addPackCoins, canFlipFree, getTimeUntilFreeFlip, payForFlip } },
     children
   );
 }
