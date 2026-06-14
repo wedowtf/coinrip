@@ -3,6 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- ── Content Security Policy ── -->
+    <!-- script-src unsafe-inline is required for Vite's module-preload bootstrap -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https:;
+      connect-src 'self'
+        https://lpkvemnytpiyfqahwqdv.supabase.co
+        wss://lpkvemnytpiyfqahwqdv.supabase.co;
+      frame-src 'none';
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    " />
+    <!-- Don't leak the full referrer URL to third parties -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <!-- Prevent MIME-type sniffing -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
     <title>CoinRip — Pack-Ripping Crypto Collectibles</title>
     <meta name="description" content="Rip packs. Collect rare coins. Discover the Orynth ecosystem. Play CoinRip free at coinrip.city" />
     <meta name="robots" content="index, follow" />
@@ -40,9 +62,9 @@
     <meta name="application-name" content="CoinRip" />
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>
