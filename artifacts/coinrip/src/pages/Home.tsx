@@ -68,32 +68,57 @@ function PackCard({ pack, canAfford, canRipFree, timeLeft, onRip, onLoginRequire
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.97 }}
-      className="snap-center shrink-0 w-[200px] rounded-2xl border-2 p-4 flex flex-col gap-3 relative overflow-hidden bg-card"
+      whileHover={{ scale: 1.04, y: -6 }}
+      whileTap={{ scale: 0.96 }}
+      className="snap-center shrink-0 w-[215px] rounded-3xl border-2 p-4 flex flex-col gap-3 relative overflow-hidden cursor-pointer"
       style={{
-        borderColor: isAvailable ? pack.color : "#2A2A35",
-        boxShadow: isAvailable ? `0 0 20px ${pack.shadowColor}` : "none",
-        opacity: isAvailable ? 1 : 0.6,
+        borderColor: isAvailable ? pack.color + 'CC' : "#252530",
+        boxShadow: isAvailable
+          ? `0 0 28px ${pack.shadowColor}, 0 0 60px ${pack.shadowColor}44, inset 0 1px 0 rgba(255,255,255,0.1)`
+          : "inset 0 1px 0 rgba(255,255,255,0.03)",
+        opacity: isAvailable ? 1 : 0.5,
+        background: isAvailable
+          ? `linear-gradient(155deg, ${pack.color}14 0%, #0D0D14 50%, ${pack.shadowColor}0A 100%)`
+          : '#0C0C12',
       }}
     >
+      {/* Shimmer sweep */}
+      {isAvailable && (
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-20 rounded-3xl"
+          style={{ background: `linear-gradient(108deg, transparent 33%, ${pack.color}30 50%, transparent 67%)` }}
+          initial={{ x: '-100%' }}
+          animate={{ x: '220%' }}
+          transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 3.5, ease: 'easeInOut' }}
+        />
+      )}
+
+      {/* Corner glow accent */}
+      <div
+        className="absolute -top-8 -right-8 w-28 h-28 rounded-full pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${pack.color}35, transparent 70%)` }}
+      />
+
       {pack.badgeLabel && (
         <span
           className="absolute top-3 right-3 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full z-10"
-          style={{ backgroundColor: pack.color, color: "#000" }}
+          style={{ backgroundColor: pack.color, color: "#000", boxShadow: `0 0 10px ${pack.color}99` }}
         >
           {pack.badgeLabel}
         </span>
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/6 via-transparent to-black/30 pointer-events-none rounded-3xl" />
 
       {/* Pack type label */}
       <div className="z-10">
         <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: pack.color }}>
           {pack.subtitle}
         </p>
-        <h3 className="font-display text-xl font-black uppercase leading-tight text-white">
+        <h3
+          className="font-display text-xl font-black uppercase leading-tight text-white"
+          style={{ textShadow: isAvailable ? `0 0 24px ${pack.color}80` : 'none' }}
+        >
           {pack.name}
         </h3>
       </div>
@@ -311,20 +336,26 @@ export default function Home() {
       {state.username && (
         <div className="flex gap-2 px-6">
           {[
-            { label: "Rips", value: state.totalRips || 0, color: "text-white" },
-            { label: "Unique", value: state.collection.length, color: "text-cyan-400" },
-            { label: "COINS", value: state.coinBalance, color: "text-primary" },
+            { label: "Rips", value: state.totalRips || 0, accent: "#E2E8F0", icon: "🎴" },
+            { label: "Unique", value: state.collection.length, accent: "#06B6D4", icon: "💎" },
+            { label: "COINS", value: state.coinBalance, accent: "#E2FF00", icon: "🪙" },
           ].map((s, i) => (
             <motion.div
               key={s.label}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              className="bg-card border border-border rounded-xl p-2.5 flex-1 text-center relative overflow-hidden"
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: i * 0.1, type: 'spring', stiffness: 300, damping: 22 }}
+              className="flex-1 text-center relative overflow-hidden rounded-2xl p-3"
+              style={{
+                background: `linear-gradient(145deg, ${s.accent}12 0%, #0D0D14 100%)`,
+                border: `1px solid ${s.accent}30`,
+                boxShadow: `0 0 20px ${s.accent}15`,
+              }}
             >
-              <div className="absolute inset-0 bg-gradient-to-b from-white/3 to-transparent pointer-events-none" />
-              <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">{s.label}</p>
-              <p className={`font-mono font-black text-lg ${s.color}`}>{s.value}</p>
+              <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+              <p className="text-base mb-0.5">{s.icon}</p>
+              <p className="font-mono font-black text-xl" style={{ color: s.accent, textShadow: `0 0 12px ${s.accent}80` }}>{s.value}</p>
+              <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider mt-0.5">{s.label}</p>
             </motion.div>
           ))}
         </div>
