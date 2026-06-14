@@ -7,6 +7,7 @@ import About from "@/pages/About";
 import Profile from "@/pages/Profile";
 import { Layout } from "@/components/layout/Layout";
 import { GameStateProvider } from "@/hooks/use-game-state";
+import { AuthProvider } from "@/hooks/use-auth";
 
 function Router() {
   return (
@@ -25,11 +26,13 @@ function Router() {
 
 function App() {
   return (
-    <GameStateProvider>
-      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-        <Router />
-      </WouterRouter>
-    </GameStateProvider>
+    <AuthProvider>
+      <GameStateProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <Router />
+        </WouterRouter>
+      </GameStateProvider>
+    </AuthProvider>
   );
 }
 
