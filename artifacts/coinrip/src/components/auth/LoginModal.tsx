@@ -26,7 +26,7 @@ function GoogleIcon() {
 type Tab = "login" | "register" | "magic";
 
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
-  const { signInEmail, signUpEmail, signInGoogle, signInMagicLink, authError, magicLinkSent, clearError } = useAuth();
+  const { signInEmail, signUpEmail, signInGoogle, signInMagicLink, authError, magicLinkSent, googleNotEnabled, clearError } = useAuth();
   const [tab, setTab] = useState<Tab>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -114,12 +114,54 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 <motion.button
                   onClick={handleGoogle}
                   disabled={googleLoading || loading}
-                  whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-                  className="relative z-10 w-full flex items-center justify-center gap-2.5 rounded-2xl border border-white/12 bg-white/6 py-3 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20 mb-3"
+                  whileHover={{ scale: googleNotEnabled ? 1 : 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="relative z-10 w-full flex items-center justify-center gap-2.5 rounded-2xl border py-3 text-sm font-bold transition-all mb-3"
+                  style={googleNotEnabled ? {
+                    borderColor: "rgba(239,68,68,0.3)",
+                    background: "rgba(239,68,68,0.08)",
+                    color: "rgba(255,255,255,0.4)",
+                    cursor: "not-allowed",
+                  } : {
+                    borderColor: "rgba(255,255,255,0.12)",
+                    background: "rgba(255,255,255,0.06)",
+                    color: "white",
+                  }}
                 >
                   {googleLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
-                  {googleLoading ? "Redirecting to Google…" : "Continue with Google"}
+                  {googleLoading
+                    ? "Redirecting to Google…"
+                    : googleNotEnabled
+                    ? "Google belum diaktifkan"
+                    : "Continue with Google"}
                 </motion.button>
+
+                {/* Google not enabled banner */}
+                <AnimatePresence>
+                  {googleNotEnabled && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mb-3 flex items-start gap-2 rounded-xl px-3 py-2.5 text-xs text-amber-400"
+                      style={{ background: "rgba(251,191,36,0.10)", border: "1px solid rgba(251,191,36,0.25)" }}
+                    >
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                      <div>
+                        Google OAuth belum diaktifkan di Supabase.{" "}
+                        <button
+                          type="button"
+                          onClick={() => { setTab("magic"); clearError(); }}
+                          className="font-bold underline text-primary"
+                        >
+                          Pakai Magic Link
+                        </button>{" "}
+                        untuk login tanpa password.
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div className="relative z-10 flex items-center gap-3 mb-3">
                   <div className="flex-1 h-px bg-white/8" />
                   <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">or</span>
@@ -144,10 +186,10 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 >
                   <CheckCircle2 className="w-12 h-12" style={{ color: "#E2FF00", filter: "drop-shadow(0 0 12px rgba(226,255,0,0.6))" }} />
                 </motion.div>
-                <p className="font-display font-black text-lg text-white uppercase">Check your inbox!</p>
-                <p className="text-sm text-zinc-400">Magic link sent to <span className="text-white font-semibold">{email}</span>. Click the link to sign in instantly.</p>
+                <p className="font-display font-black text-lg text-white uppercase">Cek inbox kamu!</p>
+                <p className="text-sm text-zinc-400">Magic link dikirim ke <span className="text-white font-semibold">{email}</span>. Klik link itu untuk langsung masuk.</p>
                 <button onClick={() => { clearError(); setEmail(""); }} className="text-xs text-primary/70 font-bold hover:text-primary transition-colors mt-1">
-                  Use a different email
+                  Ganti email
                 </button>
               </motion.div>
             )}
@@ -190,20 +232,20 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
               {tab === "magic" && (
                 <p className="text-[10px] text-zinc-500 text-center px-2">
-                  No password needed — we send a login link to your email via Resend. No rate limits.
+                  Tanpa password — kami kirim link login ke email kamu via Resend. Tidak ada rate limit.
                 </p>
               )}
 
               <AnimatePresence>
-                {authError && (
+                {authError && !googleNotEnabled && (
                   <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                     className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold text-red-400"
                     style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)" }}>
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     {authError}
-                    {authError.includes("Magic Link") && (
+                    {(authError.includes("Magic Link") || authError.includes("coba Magic Link")) && (
                       <button type="button" onClick={() => { setTab("magic"); clearError(); }}
-                        className="ml-auto text-primary font-bold underline text-[10px]">Switch</button>
+                        className="ml-auto text-primary font-bold underline text-[10px] shrink-0">Pindah</button>
                     )}
                   </motion.div>
                 )}
@@ -215,8 +257,8 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                   style={{ boxShadow: "0 4px 24px rgba(226,255,0,0.4)" }}>
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> :
                     tab === "login" ? "Sign In →" :
-                    tab === "register" ? "Create Account →" :
-                    <><Sparkles className="w-4 h-4 mr-1" />Send Magic Link</>}
+                    tab === "register" ? "Buat Akun →" :
+                    <><Sparkles className="w-4 h-4 mr-1" />Kirim Magic Link</>}
                 </Button>
               </motion.div>
             </form>
@@ -224,12 +266,12 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
 
           {tab !== "magic" && (
             <p className="relative z-10 text-center text-[10px] text-zinc-600 mt-3">
-              {tab === "login" ? "No password? " : "Already have an account? "}
+              {tab === "login" ? "Tidak ingat password? " : "Sudah punya akun? "}
               <button
-                onClick={() => { setTab(tab === "login" ? "register" : "login"); clearError(); }}
+                onClick={() => { setTab(tab === "login" ? "magic" : "login"); clearError(); }}
                 className="text-primary/80 font-bold hover:text-primary transition-colors"
               >
-                {tab === "login" ? "Use Magic Link" : "Sign in"}
+                {tab === "login" ? "Pakai Magic Link" : "Sign In"}
               </button>
             </p>
           )}
@@ -238,4 +280,3 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     </Dialog>
   );
 }
-
