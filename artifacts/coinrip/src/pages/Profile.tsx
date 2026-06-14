@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useGameState } from "@/hooks/use-game-state";
+import { useAuth } from "@/hooks/use-auth";
 import { COINS } from "@/lib/dataset";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
-import { LogOut, Package, LayoutGrid, Trophy, Zap, Star, ChevronRight } from "lucide-react";
+import { LogOut, Package, LayoutGrid, Trophy, Zap, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -40,6 +41,7 @@ function CoinLogo({ logoUrl, name, color }: { logoUrl: string; name: string; col
 
 export default function Profile() {
   const { state, logout, isLoaded } = useGameState();
+  const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [showLogout, setShowLogout] = useState(false);
 
@@ -132,7 +134,7 @@ export default function Profile() {
         <div className="relative flex items-start gap-4">
           {/* Avatar */}
           <motion.div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 border-2 relative overflow-hidden"
+            className="w-16 h-16 rounded-2xl shrink-0 border-2 relative overflow-hidden flex items-center justify-center"
             style={{
               background: `linear-gradient(135deg, ${rank.color}44, ${rank.color}11)`,
               borderColor: rank.color + '60',
@@ -140,15 +142,22 @@ export default function Profile() {
             animate={{ boxShadow: [`0 0 0px ${rank.shadow}`, `0 0 20px ${rank.shadow}`, `0 0 0px ${rank.shadow}`] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <span className="font-display font-black text-3xl" style={{ color: rank.color, textShadow: `0 0 20px ${rank.color}` }}>
-              {state.username.charAt(0).toUpperCase()}
-            </span>
+            {user?.photoURL ? (
+              <img src={user.photoURL} alt={state.username ?? ''} className="w-full h-full object-cover" />
+            ) : (
+              <span className="font-display font-black text-3xl" style={{ color: rank.color, textShadow: `0 0 20px ${rank.color}` }}>
+                {state.username.charAt(0).toUpperCase()}
+              </span>
+            )}
           </motion.div>
 
           <div className="flex-1 min-w-0">
             <h2 className="font-display font-black text-xl text-white leading-tight truncate">
               {state.username}
             </h2>
+            {user?.email && (
+              <p className="text-[10px] text-zinc-500 truncate mt-0.5">{user.email}</p>
+            )}
             <motion.div
               className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest"
               style={{
@@ -429,7 +438,7 @@ export default function Profile() {
             </DialogHeader>
             <div className="text-center space-y-4 py-3 relative z-10">
               <p className="text-sm text-muted-foreground">
-                Your vault is saved locally. You can log back in with the same username anytime.
+                Vault kamu tersimpan. Login lagi kapan saja dengan akun yang sama.
               </p>
               <div className="flex gap-3">
                 <Button variant="outline" className="flex-1" onClick={() => setShowLogout(false)}>Cancel</Button>
