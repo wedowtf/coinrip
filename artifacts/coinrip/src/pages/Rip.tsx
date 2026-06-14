@@ -23,41 +23,140 @@ const PKG_FLIP: Record<PackId, { bg: string; tri: string; crimp: string; text: s
   galaxy:  { bg: "#F0C838", tri: "#FFF8CC", crimp: "#C09000", text: "#201800", sub: "#705000" },
 };
 
-const CRIMP_S = 16; /* crimp height for coin cards */
+const CRIMP_S = 16;
 const PACK_COINS = 6;
+
+/* ════════════════════════════════════════
+   Card Back — shown before flip
+════════════════════════════════════════ */
+function CardBack({ packColor, packCrimp }: { packColor: string; packCrimp: string }) {
+  return (
+    <div style={{
+      width: "100%", height: "100%",
+      borderRadius: 16, overflow: "hidden",
+      backfaceVisibility: "hidden",
+      WebkitBackfaceVisibility: "hidden",
+      position: "absolute", inset: 0,
+      boxShadow: "0 2px 4px rgba(0,0,0,0.18), 0 8px 18px rgba(0,0,0,0.26), 0 20px 44px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.55)",
+    }}>
+      {/* Top crimp */}
+      <div style={{ height: CRIMP_S, background: packCrimp, position: "relative", overflow: "hidden" }}>
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.10) 2px, rgba(0,0,0,0.10) 3px)",
+        }} />
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: 4,
+          background: "linear-gradient(180deg, rgba(255,255,255,0.40), transparent)",
+        }} />
+      </div>
+
+      {/* Main body */}
+      <div style={{
+        flex: 1, background: packColor, position: "relative",
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", padding: "10px", gap: 6,
+        height: `calc(100% - ${CRIMP_S * 2}px)`,
+      }}>
+        {/* Diagonal accent */}
+        <div style={{
+          position: "absolute", top: 0, right: 0, width: 0, height: 0,
+          borderStyle: "solid", borderWidth: "0 80px 50px 0",
+          borderColor: `transparent rgba(255,255,255,0.22) transparent transparent`,
+        }} />
+        {/* Gloss overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(145deg, rgba(255,255,255,0.38) 0%, transparent 55%)",
+          pointerEvents: "none",
+        }} />
+        {/* Grid pattern */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px)",
+          backgroundSize: "12px 12px",
+        }} />
+        {/* Logo mark */}
+        <div style={{
+          position: "relative", zIndex: 10, textAlign: "center",
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+        }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: "50%",
+            background: "rgba(0,0,0,0.18)",
+            border: "2px solid rgba(0,0,0,0.20)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "inset 0 2px 6px rgba(0,0,0,0.20)",
+          }}>
+            <span style={{ fontSize: 16, lineHeight: 1 }}>🪙</span>
+          </div>
+          <span style={{
+            fontSize: 8, fontWeight: 900, letterSpacing: "0.3em",
+            textTransform: "uppercase", color: "rgba(0,0,0,0.50)",
+          }}>COINRIP</span>
+        </div>
+      </div>
+
+      {/* Bottom crimp */}
+      <div style={{ height: CRIMP_S, background: packCrimp, position: "relative", overflow: "hidden" }}>
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.10) 2px, rgba(0,0,0,0.10) 3px)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, height: 4,
+          background: "linear-gradient(0deg, rgba(0,0,0,0.20), transparent)",
+        }} />
+        {/* barcode */}
+        <div style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 1.5,
+        }}>
+          {Array.from({ length: 14 }).map((_, i) => (
+            <div key={i} style={{
+              width: i % 3 === 0 ? 2 : 1,
+              height: i % 4 === 0 ? 10 : 7,
+              background: "rgba(0,0,0,0.35)", borderRadius: 0.5,
+            }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ════════════════════════════════════════
    Physical coin card — snack-pack style
 ════════════════════════════════════════ */
-function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: boolean }) {
+function CoinCard({
+  coin, index, isBest, packBg, packCrimp,
+}: {
+  coin: Coin; index: number; isBest: boolean; packBg: string; packCrimp: string;
+}) {
   const [imgErr, setImgErr] = useState(false);
   const p = TIER_PASTEL[coin.tier as keyof typeof TIER_PASTEL];
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50, rotateX: 20, scale: 0.85 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
-      transition={{
-        delay: index * 0.11 + 0.18,
-        type: "spring",
-        stiffness: 240,
-        damping: 20,
-      }}
-      style={{
-        borderRadius: 16,
-        overflow: "hidden",
-        position: "relative",
-        boxShadow: isBest
-          ? `0 2px 4px rgba(0,0,0,0.22), 0 10px 24px rgba(0,0,0,0.32), 0 28px 60px rgba(0,0,0,0.25), 0 0 0 2px ${p.crimp}, inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -2px 0 rgba(0,0,0,0.18), 0 0 40px ${p.glow}`
-          : `0 2px 4px rgba(0,0,0,0.18), 0 8px 18px rgba(0,0,0,0.26), 0 20px 44px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 0 rgba(0,0,0,0.15)`,
-      }}
-    >
+  /* Stagger: each card flips one after the other */
+  const flipDelay = index * 0.13 + 0.08;
+
+  const cardFront = (
+    <div style={{
+      width: "100%", height: "100%",
+      borderRadius: 16, overflow: "hidden",
+      backfaceVisibility: "hidden",
+      WebkitBackfaceVisibility: "hidden",
+      position: "absolute", inset: 0,
+      transform: "rotateY(0deg)",
+      boxShadow: isBest
+        ? `0 2px 4px rgba(0,0,0,0.22), 0 10px 24px rgba(0,0,0,0.32), 0 28px 60px rgba(0,0,0,0.25), 0 0 0 2px ${p.crimp}, inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -2px 0 rgba(0,0,0,0.18), 0 0 40px ${p.glow}`
+        : `0 2px 4px rgba(0,0,0,0.18), 0 8px 18px rgba(0,0,0,0.26), 0 20px 44px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -1px 0 rgba(0,0,0,0.15)`,
+    }}>
       {/* BEST sticker */}
       {isBest && (
         <motion.div
           initial={{ scale: 0, rotate: -15 }}
           animate={{ scale: 1, rotate: -12 }}
-          transition={{ delay: index * 0.11 + 0.55, type: "spring", stiffness: 420 }}
+          transition={{ delay: flipDelay + 0.42, type: "spring", stiffness: 420 }}
           style={{
             position: "absolute", top: CRIMP_S + 6, right: 8, zIndex: 30,
             background: p.crimp, color: p.tri, fontSize: 7, fontWeight: 900,
@@ -75,7 +174,7 @@ function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: 
       }}>
         <div style={{
           position: "absolute", inset: 0,
-          backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.10) 2px, rgba(0,0,0,0.10) 3px)`,
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.10) 2px, rgba(0,0,0,0.10) 3px)",
         }} />
         <div style={{
           position: "absolute", top: 0, left: 0, right: 0, height: 4,
@@ -120,7 +219,7 @@ function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: 
           background: "linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.08) 100%)",
           pointerEvents: "none",
         }} />
-        {/* Animated shine */}
+        {/* Animated shine (best card) */}
         {isBest && (
           <motion.div
             style={{
@@ -145,7 +244,7 @@ function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: 
         <div style={{
           width: 60, height: 60, borderRadius: "50%",
           background: "rgba(0,0,0,0.12)",
-          border: `2px solid rgba(0,0,0,0.14)`,
+          border: "2px solid rgba(0,0,0,0.14)",
           display: "flex", alignItems: "center", justifyContent: "center",
           overflow: "hidden", position: "relative", zIndex: 10, flexShrink: 0,
           boxShadow: "inset 0 2px 6px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.15)",
@@ -167,9 +266,7 @@ function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: 
         </div>
 
         {/* Ticker — big */}
-        <div style={{
-          position: "relative", zIndex: 10, textAlign: "center",
-        }}>
+        <div style={{ position: "relative", zIndex: 10, textAlign: "center" }}>
           <p style={{
             fontSize: 15, fontWeight: 900, letterSpacing: "0.04em",
             color: p.text,
@@ -192,7 +289,7 @@ function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: 
       }}>
         <div style={{
           position: "absolute", inset: 0,
-          backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.10) 2px, rgba(0,0,0,0.10) 3px)`,
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.10) 2px, rgba(0,0,0,0.10) 3px)",
         }} />
         <div style={{
           position: "absolute", bottom: 0, left: 0, right: 0, height: 4,
@@ -202,7 +299,6 @@ function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: 
           position: "absolute", inset: 0,
           background: "linear-gradient(90deg, rgba(0,0,0,0.18) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.18) 100%)",
         }} />
-        {/* mini barcode */}
         <div style={{
           position: "absolute", inset: 0,
           display: "flex", alignItems: "center", justifyContent: "center", gap: 1.5,
@@ -216,7 +312,56 @@ function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: 
           ))}
         </div>
       </div>
-    </motion.div>
+    </div>
+  );
+
+  return (
+    /* Perspective wrapper — gives depth to the 3D flip */
+    <div style={{ perspective: "900px", perspectiveOrigin: "50% 50%" }}>
+      <motion.div
+        initial={{ rotateY: 180, y: 18, scale: 0.92 }}
+        animate={{ rotateY: 0, y: 0, scale: 1 }}
+        transition={{
+          rotateY: {
+            delay: flipDelay,
+            duration: 0.62,
+            ease: [0.25, 0.1, 0.25, 1.0],
+          },
+          y: {
+            delay: flipDelay,
+            duration: 0.55,
+            ease: [0.34, 1.26, 0.64, 1],
+          },
+          scale: {
+            delay: flipDelay,
+            duration: 0.55,
+            ease: [0.34, 1.26, 0.64, 1],
+          },
+        }}
+        style={{
+          position: "relative",
+          transformStyle: "preserve-3d",
+          willChange: "transform",
+          /* aspect ratio ~1.6:1 for snack-pack card feel */
+          width: "100%",
+          aspectRatio: "0.65 / 1",
+          minHeight: 150,
+        }}
+      >
+        {/* FRONT face */}
+        {cardFront}
+
+        {/* BACK face — visible during the flip rotation */}
+        <div style={{
+          position: "absolute", inset: 0,
+          backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden",
+          transform: "rotateY(180deg)",
+        }}>
+          <CardBack packColor={packBg} packCrimp={packCrimp} />
+        </div>
+      </motion.div>
+    </div>
   );
 }
 
@@ -261,7 +406,7 @@ function PhysicalPack({ pack, stage }: { pack: typeof PACKS[0]; stage: "shaking"
     }}>
       {/* Top crimp */}
       <div style={{ height: CRIMP_P, background: p.crimp, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px)` }} />
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px)" }} />
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "linear-gradient(180deg, rgba(255,255,255,0.45), transparent)" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px" }}>
@@ -277,17 +422,13 @@ function PhysicalPack({ pack, stage }: { pack: typeof PACKS[0]; stage: "shaking"
 
       {/* Main body */}
       <div style={{ flex: 1, height: 310 - CRIMP_P * 2, background: p.bg, position: "relative", overflow: "hidden" }}>
-        {/* Diagonal triangle */}
         <div style={{ position: "absolute", top: 0, right: 0, width: 0, height: 0, borderStyle: "solid", borderWidth: "0 200px 110px 0", borderColor: `transparent ${p.tri} transparent transparent`, opacity: 0.85 }} />
-        {/* Gloss */}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(145deg, rgba(255,255,255,0.42) 0%, transparent 45%)", pointerEvents: "none" }} />
-        {/* Animated shine */}
         <motion.div
           style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "linear-gradient(108deg, transparent 25%, rgba(255,255,255,0.28) 48%, rgba(255,255,255,0.10) 52%, transparent 75%)" }}
           initial={{ x: "-100%" }} animate={{ x: "200%" }}
           transition={{ duration: 1.8, repeat: Infinity, repeatDelay: 0.8, ease: "easeInOut" }}
         />
-        {/* Content */}
         <div style={{ position: "relative", zIndex: 10, height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, padding: "0 20px" }}>
           <p style={{ fontSize: 9, fontWeight: 800, color: p.sub, textTransform: "uppercase", letterSpacing: "0.2em" }}>{pack.subtitle}</p>
           <h2 style={{ fontSize: 36, fontWeight: 900, color: p.text, textTransform: "uppercase", textAlign: "center", lineHeight: 0.9, textShadow: "1px 2px 0 rgba(255,255,255,0.5)" }}>{pack.name}</h2>
@@ -304,7 +445,7 @@ function PhysicalPack({ pack, stage }: { pack: typeof PACKS[0]; stage: "shaking"
 
       {/* Bottom crimp */}
       <div style={{ height: CRIMP_P, background: p.crimp, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px)` }} />
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px)" }} />
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 6, background: "linear-gradient(0deg, rgba(0,0,0,0.22), transparent)" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 2 }}>
@@ -328,14 +469,27 @@ export default function Rip() {
   const packId = (params.get("pack") || "daily") as PackId;
   const pack = PACKS.find(p => p.id === packId) ?? PACKS[0];
   const packColor = PKG_FLIP[packId].bg;
+  const packCrimp = PKG_FLIP[packId].crimp;
 
   const [stage, setStage] = useState<"shaking" | "tearing" | "reveal">("shaking");
   const [revealedCoins, setRevealedCoins] = useState<Coin[]>([]);
   const [showParticles, setShowParticles] = useState(false);
   const [screenFlash, setScreenFlash] = useState(false);
   const [flipError, setFlipError] = useState<string | null>(null);
+
+  /* Track readiness: we need BOTH timer AND API data before revealing */
+  const timerReady = useRef(false);
+  const coinsReady = useRef(false);
   const claimed = useRef(false);
   const ripStarted = useRef(false);
+
+  const triggerReveal = () => {
+    if (!timerReady.current || !coinsReady.current) return;
+    setScreenFlash(true);
+    setTimeout(() => setScreenFlash(false), 400);
+    setStage("reveal");
+    setShowParticles(true);
+  };
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -343,7 +497,7 @@ export default function Rip() {
     if (ripStarted.current) return;
     ripStarted.current = true;
 
-    // Start server flip and animation simultaneously for zero perceived latency
+    /* Fire API call and animation simultaneously */
     flipPack(packId)
       .then(result => {
         const fullCoins = result.coins.map(sc => {
@@ -354,19 +508,20 @@ export default function Rip() {
           };
         });
         setRevealedCoins(fullCoins);
+        coinsReady.current = true;
+        triggerReveal();
       })
       .catch(err => setFlipError((err as Error).message ?? "Flip failed"));
 
     const t1 = setTimeout(() => setStage("tearing"), 1600);
     const t2 = setTimeout(() => {
-      setScreenFlash(true);
-      setTimeout(() => setScreenFlash(false), 400);
-      setStage("reveal");
-      setShowParticles(true);
+      timerReady.current = true;
+      triggerReveal();
     }, 3000);
 
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [isLoaded, state.username, setLocation, packId, flipPack]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded]);
 
   const handleClaim = () => {
     if (!claimed.current) {
@@ -437,7 +592,6 @@ export default function Rip() {
           style={{ transformOrigin: "center center" }}
         >
           {stage === "tearing" ? (
-            /* ── TEAR: pack splits in two ── */
             <div style={{ position: "relative", width: 200, height: 310 }}>
               {/* Top half flies up */}
               <motion.div
@@ -555,10 +709,17 @@ export default function Rip() {
           transition={{ delay: 0.2, duration: 0.55 }} />
       </motion.div>
 
-      {/* 2×3 coin card grid */}
+      {/* 2×3 coin card grid — each card flips in */}
       <div className="w-full z-10 grid grid-cols-2 gap-3 mb-4">
         {revealedCoins.map((coin, i) => (
-          <CoinCard key={coin.name + i} coin={coin} index={i} isBest={coin === actualBest} />
+          <CoinCard
+            key={coin.name + i}
+            coin={coin}
+            index={i}
+            isBest={coin === actualBest}
+            packBg={packColor}
+            packCrimp={packCrimp}
+          />
         ))}
       </div>
 
