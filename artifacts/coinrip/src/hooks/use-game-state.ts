@@ -26,6 +26,8 @@ const DEFAULT_STATE: GameState = {
   totalRips: 0,
 };
 
+const DEMO_STARTING_BALANCE = 500;
+
 const getStorageKey = (username: string) => `coinrip_state_${username}`;
 
 function loadUserState(username: string): GameState {
@@ -33,7 +35,7 @@ function loadUserState(username: string): GameState {
   if (raw) {
     return { ...DEFAULT_STATE, ...JSON.parse(raw), username };
   }
-  const fresh: GameState = { ...DEFAULT_STATE, username, coinBalance: 50 };
+  const fresh: GameState = { ...DEFAULT_STATE, username, coinBalance: DEMO_STARTING_BALANCE };
   localStorage.setItem(getStorageKey(username), JSON.stringify(fresh));
   return fresh;
 }
@@ -44,6 +46,7 @@ interface GameStateCtx {
   login: (username: string) => void;
   logout: () => void;
   addCoin: (coinName: string, packId?: PackId) => void;
+  addPackCoins: (coinNames: string[], packId?: PackId) => void;
   canRipFree: () => boolean;
   getTimeUntilFreeRip: () => string | null;
   payForRip: (cost: number) => boolean;
@@ -55,8 +58,6 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<GameState>(DEFAULT_STATE);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Single init effect — sets full state THEN marks loaded.
-  // isLoaded=true guarantees state.username is correct (not null mid-load).
   useEffect(() => {
     const stored = localStorage.getItem('coinrip_active_user');
     if (stored) {
@@ -91,7 +92,6 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
             c.name === coinName ? { ...c, quantity: c.quantity + 1 } : c
           )
         : [...prev.collection, { name: coinName, quantity: 1 }];
-
       const next: GameState = {
         ...prev,
         collection: newCollection,
@@ -108,12 +108,40 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // Batch-add all coins from a single pack rip — counts as 1 rip, earns 2 coins per coin received
+  const addPackCoins = useCallback((coinNames: string[], packId?: PackId) => {
+    setState(prev => {
+      if (!prev.username) return prev;
+      let newCollection = [...prev.collection];
+      for (const coinName of coinNames) {
+        const existing = newCollection.find(c => c.name === coinName);
+        if (existing) {
+          newCollection = newCollection.map(c =>
+            c.name === coinName ? { ...c, quantity: c.quantity + 1 } : c
+          );
+        } else {
+          newCollection = [...newCollection, { name: coinName, quantity: 1 }];
+        }
+      }
+      const newPulls = [...coinNames, ...(prev.recentPulls || [])].slice(0, 20);
+      const next: GameState = {
+        ...prev,
+        collection: newCollection,
+        coinBalance: prev.coinBalance + coinNames.length * 2,
+        lastRipTimestamp: Date.now(),
+        totalRips: (prev.totalRips || 0) + 1,
+        recentPulls: newPulls,
+        ...(packId === 'daily' ? { lastFreeDailyTimestamp: Date.now() } : {}),
+      };
+      localStorage.setItem(getStorageKey(next.username!), JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   const payForRip = useCallback((cost: number): boolean => {
-    // Check against current state snapshot (closure is always fresh because
-    // payForRip is re-created when state.coinBalance changes).
     if (state.coinBalance < cost) return false;
     setState(prev => {
-      if (prev.coinBalance < cost) return prev; // safety re-check
+      if (prev.coinBalance < cost) return prev;
       const next = { ...prev, coinBalance: prev.coinBalance - cost };
       persist(next);
       return next;
@@ -135,10 +163,9 @@ export function GameStateProvider({ children }: { children: React.ReactNode }) {
     return `${h}h ${m}m`;
   }, [state.lastFreeDailyTimestamp]);
 
-  // .ts file — cannot use JSX, use createElement instead
   return React.createElement(
     Ctx.Provider,
-    { value: { state, isLoaded, login, logout, addCoin, canRipFree, getTimeUntilFreeRip, payForRip } },
+    { value: { state, isLoaded, login, logout, addCoin, addPackCoins, canRipFree, getTimeUntilFreeRip, payForRip } },
     children
   );
 }
