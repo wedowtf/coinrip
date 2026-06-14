@@ -4,6 +4,7 @@ export type Tier = 'SPARK' | 'FLARE' | 'NOVA' | 'PULSAR' | 'SINGULARITY';
 
 export interface Coin {
   name: string;
+  ticker: string;
   tagline: string;
   marketCap: number;
   tier: Tier;
@@ -12,26 +13,26 @@ export interface Coin {
 }
 
 const RAW_COINS = [
-  { name: 'Alpie',          tagline: 'An AI workspace that thinks with you',         marketCap: 1200000, category: 'AI Tools' },
-  { name: 'Orynth',         tagline: 'Where products find their first users',         marketCap: 384800,  category: 'Marketplace' },
-  { name: 'Moonshift',      tagline: 'Type your idea. Wake up to a deployed app.',    marketCap: 141800,  category: 'Dev Tools' },
-  { name: 'MangaNow',       tagline: 'Transform text and videos into manga',          marketCap: 75700,   category: 'Creative' },
-  { name: 'MagTapp',        tagline: 'Browser, PDF, and productivity tools',          marketCap: 40400,   category: 'Productivity' },
-  { name: 'SuzuPay',        tagline: 'QR code payments, redefined',                  marketCap: 22000,   category: 'Fintech' },
-  { name: 'Avocado AI',     tagline: 'Ship client-ready ads instantly',               marketCap: 19700,   category: 'Marketing' },
-  { name: 'AVATAR UI',      tagline: 'Next-gen interface design system',              marketCap: 14600,   category: 'Design' },
-  { name: 'Brain',          tagline: 'Infrastructure for AI agents',                  marketCap: 11400,   category: 'AI Infra' },
-  { name: 'Relaxsync',      tagline: '20-sided roll/rotate meditation tool',          marketCap: 10600,   category: 'Wellness' },
-  { name: 'Ordina',         tagline: 'Your 24/7 AI secretary',                        marketCap: 10300,   category: 'AI Tools' },
-  { name: 'Degen Terminal', tagline: 'AI-powered trading terminal',                   marketCap: 9200,    category: 'Fintech' },
-  { name: 'inspireXgrowth', tagline: 'AI growth tools for founders',                  marketCap: 9000,    category: 'Growth' },
-  { name: 'Aniverse',       tagline: '3D x AI next-gen experience',                   marketCap: 7600,    category: 'Creative' },
-  { name: 'RedCircle',      tagline: 'Bringing Reddit posts to crypto',               marketCap: 7000,    category: 'Social' },
-  { name: 'FeedRun',        tagline: 'Feedback forms that actually convert',          marketCap: 6400,    category: 'Productivity' },
-  { name: 'Whitespace',     tagline: 'Personalized meditation, anywhere',             marketCap: 6400,    category: 'Wellness' },
-  { name: 'XScouter AI',    tagline: "Don't trust. Verify. Score.",                   marketCap: 6300,    category: 'AI Tools' },
-  { name: 'Cofounder Hunt', tagline: 'Find your co-founder today',                    marketCap: 6200,    category: 'Community' },
-  { name: 'lilAgents',      tagline: 'Agents you can hire by the task',               marketCap: 6200,    category: 'AI Infra' },
+  { name: 'Alpie',          ticker: '$ALPIE', tagline: 'An AI workspace that thinks with you',         marketCap: 1200000, category: 'AI Tools' },
+  { name: 'Orynth',         ticker: '$ORYN',  tagline: 'Where products find their first users',         marketCap: 384800,  category: 'Marketplace' },
+  { name: 'Moonshift',      ticker: '$SHIFT', tagline: 'Type your idea. Wake up to a deployed app.',    marketCap: 141800,  category: 'Dev Tools' },
+  { name: 'MangaNow',       ticker: '$MANGA', tagline: 'Transform text and videos into manga',          marketCap: 75700,   category: 'Creative' },
+  { name: 'MagTapp',        ticker: '$MAGT',  tagline: 'Browser, PDF, and productivity tools',          marketCap: 40400,   category: 'Productivity' },
+  { name: 'SuzuPay',        ticker: '$SUZU',  tagline: 'QR code payments, redefined',                  marketCap: 22000,   category: 'Fintech' },
+  { name: 'Avocado AI',     ticker: '$AVO',   tagline: 'Ship client-ready ads instantly',               marketCap: 19700,   category: 'Marketing' },
+  { name: 'AVATAR UI',      ticker: '$AVTR',  tagline: 'Next-gen interface design system',              marketCap: 14600,   category: 'Design' },
+  { name: 'Brain',          ticker: '$BRAIN', tagline: 'Infrastructure for AI agents',                  marketCap: 11400,   category: 'AI Infra' },
+  { name: 'Relaxsync',      ticker: '$RELX',  tagline: '20-sided roll/rotate meditation tool',          marketCap: 10600,   category: 'Wellness' },
+  { name: 'Ordina',         ticker: '$ORDI',  tagline: 'Your 24/7 AI secretary',                        marketCap: 10300,   category: 'AI Tools' },
+  { name: 'Degen Terminal', ticker: '$DEGEN', tagline: 'AI-powered trading terminal',                   marketCap: 9200,    category: 'Fintech' },
+  { name: 'inspireXgrowth', ticker: '$IXG',   tagline: 'AI growth tools for founders',                  marketCap: 9000,    category: 'Growth' },
+  { name: 'Aniverse',       ticker: '$ANI',   tagline: '3D x AI next-gen experience',                   marketCap: 7600,    category: 'Creative' },
+  { name: 'RedCircle',      ticker: '$RDCL',  tagline: 'Bringing Reddit posts to crypto',               marketCap: 7000,    category: 'Social' },
+  { name: 'FeedRun',        ticker: '$FEED',  tagline: 'Feedback forms that actually convert',          marketCap: 6400,    category: 'Productivity' },
+  { name: 'Whitespace',     ticker: '$WHITE', tagline: 'Personalized meditation, anywhere',             marketCap: 6400,    category: 'Wellness' },
+  { name: 'XScouter AI',    ticker: '$XSCO',  tagline: "Don't trust. Verify. Score.",                   marketCap: 6300,    category: 'AI Tools' },
+  { name: 'Cofounder Hunt', ticker: '$CFH',   tagline: 'Find your co-founder today',                    marketCap: 6200,    category: 'Community' },
+  { name: 'lilAgents',      ticker: '$LILA',  tagline: 'Agents you can hire by the task',               marketCap: 6200,    category: 'AI Infra' },
 ];
 
 export const getTier = (marketCap: number): Tier => {
@@ -68,7 +69,7 @@ export const PACKS: PackDef[] = [
     id: 'daily',
     name: 'Free Daily',
     subtitle: 'Pack',
-    description: '1 random coin • Any tier • Resets every 24h',
+    description: '6 coins • Any tier • Resets every 24h',
     cost: 0,
     color: '#E2FF00',
     shadowColor: 'rgba(226,255,0,0.35)',
@@ -79,7 +80,7 @@ export const PACKS: PackDef[] = [
     id: 'mystery',
     name: 'Mystery',
     subtitle: 'Pack',
-    description: 'Unknown contents • Standard drop rates',
+    description: '6 coins • Unknown contents • Standard drop rates',
     cost: 10,
     color: '#D946EF',
     shadowColor: 'rgba(217,70,239,0.35)',
@@ -90,7 +91,7 @@ export const PACKS: PackDef[] = [
     id: 'starter',
     name: 'Starter',
     subtitle: 'Bundle',
-    description: 'For newcomers • Guaranteed FLARE or better',
+    description: '6 coins • Guaranteed FLARE or better',
     cost: 25,
     color: '#F97316',
     shadowColor: 'rgba(249,115,22,0.35)',
@@ -101,7 +102,7 @@ export const PACKS: PackDef[] = [
     id: 'blazer',
     name: 'Blazer',
     subtitle: 'Pack',
-    description: 'Boosted rates • Minimum NOVA tier drop',
+    description: '6 coins • Minimum NOVA tier drop',
     cost: 50,
     color: '#06B6D4',
     shadowColor: 'rgba(6,182,212,0.35)',
@@ -112,7 +113,7 @@ export const PACKS: PackDef[] = [
     id: 'cosmic',
     name: 'Cosmic',
     subtitle: 'Vault',
-    description: 'Premium only • PULSAR guaranteed',
+    description: '6 coins • PULSAR guaranteed every pull',
     cost: 100,
     color: '#A855F7',
     shadowColor: 'rgba(168,85,247,0.45)',
@@ -123,7 +124,7 @@ export const PACKS: PackDef[] = [
     id: 'galaxy',
     name: 'Galaxy',
     subtitle: 'Pull',
-    description: 'Ultra rare • 80% shot at SINGULARITY',
+    description: '6 coins • 80% shot at SINGULARITY each',
     cost: 200,
     color: '#FBBF24',
     shadowColor: 'rgba(251,191,36,0.5)',
