@@ -14,7 +14,7 @@ const TIER_PASTEL = {
 } as const;
 
 /* ── pack packaging colors (matches Home.tsx PKG) ── */
-const PKG_RIP: Record<PackId, { bg: string; tri: string; crimp: string; text: string; sub: string }> = {
+const PKG_FLIP: Record<PackId, { bg: string; tri: string; crimp: string; text: string; sub: string }> = {
   daily:   { bg: "#F5E95A", tri: "#FFFDE0", crimp: "#D4CC20", text: "#2A2600", sub: "#6A6200" },
   mystery: { bg: "#CC7AE8", tri: "#F0D8FF", crimp: "#9038C0", text: "#28003A", sub: "#60108A" },
   starter: { bg: "#F09055", tri: "#FFEACC", crimp: "#C85820", text: "#2A0A00", sub: "#7A2800" },
@@ -90,7 +90,7 @@ function CoinCard({ coin, index, isBest }: { coin: Coin; index: number; isBest: 
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
           <span style={{ fontSize: 7, fontWeight: 900, color: p.text + "80", textTransform: "uppercase", letterSpacing: "0.25em" }}>
-            COINRIP
+            COINFLIP
           </span>
         </div>
       </div>
@@ -250,7 +250,7 @@ function Particle({ index, color, big }: { index: number; color: string; big: bo
 
 /* ── physical pack for shake/tear stage ── */
 function PhysicalPack({ pack, stage }: { pack: typeof PACKS[0]; stage: "shaking" | "tearing" }) {
-  const p = PKG_RIP[pack.id];
+  const p = PKG_FLIP[pack.id];
   const CRIMP_P = 28;
 
   return (
@@ -265,7 +265,7 @@ function PhysicalPack({ pack, stage }: { pack: typeof PACKS[0]; stage: "shaking"
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "linear-gradient(180deg, rgba(255,255,255,0.45), transparent)" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(0,0,0,0.15) 0%, transparent 25%, transparent 75%, rgba(0,0,0,0.15) 100%)" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 12px" }}>
-          <span style={{ fontSize: 8, fontWeight: 900, color: p.text + "88", textTransform: "uppercase", letterSpacing: "0.3em" }}>COINRIP</span>
+          <span style={{ fontSize: 8, fontWeight: 900, color: p.text + "88", textTransform: "uppercase", letterSpacing: "0.3em" }}>COINFLIP</span>
           {pack.badgeLabel && (
             <span style={{ fontSize: 7, fontWeight: 900, background: p.text, color: p.bg, padding: "2px 6px", borderRadius: 99, textTransform: "uppercase" }}>{pack.badgeLabel}</span>
           )}
@@ -297,7 +297,7 @@ function PhysicalPack({ pack, stage }: { pack: typeof PACKS[0]; stage: "shaking"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 0.65, repeat: Infinity }}
           >
-            {stage === "tearing" ? "Opening…" : "Ripping!"}
+            {stage === "tearing" ? "Opening…" : "Flipping!"}
           </motion.p>
         </div>
       </div>
@@ -327,7 +327,7 @@ export default function Rip() {
   const params = new URLSearchParams(search);
   const packId = (params.get("pack") || "daily") as PackId;
   const pack = PACKS.find(p => p.id === packId) ?? PACKS[0];
-  const packColor = PKG_RIP[packId].bg;
+  const packColor = PKG_FLIP[packId].bg;
 
   const [stage, setStage] = useState<"shaking" | "tearing" | "reveal">("shaking");
   const [revealedCoins, setRevealedCoins] = useState<Coin[]>([]);
@@ -453,7 +453,7 @@ export default function Rip() {
             style={{ color: packColor + "CC" }}
             animate={{ opacity: [0.4, 1, 0.4] }}
             transition={{ duration: 1, repeat: Infinity }}
-          >Ripping open…</motion.p>
+          >Flipping open…</motion.p>
         )}
       </div>
     );
@@ -600,7 +600,7 @@ export default function Rip() {
           whileTap={{ scale: 0.97 }}
           className="w-full py-3 rounded-2xl font-bold text-sm uppercase tracking-wide text-zinc-500"
           style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)" }}
-        >← Rip Another Pack</motion.button>
+        >← Flip Another Pack</motion.button>
       </div>
     </div>
   );
