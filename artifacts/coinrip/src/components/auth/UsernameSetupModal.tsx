@@ -21,18 +21,29 @@ function hint(val: string): string | null {
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  mode?: "setup" | "change";
+  initialValue?: string;
 }
 
-export function UsernameSetupModal({ open, onOpenChange }: Props) {
+export function UsernameSetupModal({ open, onOpenChange, mode = "setup", initialValue = "" }: Props) {
   const { setDisplayName } = useAuth();
   const { updateUsername } = useGameState();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(initialValue);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const err = hint(value);
   const isValid = USERNAME_RE.test(value);
+  const isChange = mode === "change";
+
+  // Reset state when modal opens
+  const handleOpenChange = (v: boolean) => {
+    if (!loading && !done) {
+      if (v) { setValue(initialValue); setDone(false); setError(null); }
+      onOpenChange(v);
+    }
+  };
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +54,7 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
       await setDisplayName(value.trim());
       await updateUsername(value.trim());
       setDone(true);
-      setTimeout(() => onOpenChange(false), 1200);
+      setTimeout(() => { onOpenChange(false); setDone(false); }, 1200);
     } catch (err) {
       setError((err as Error).message ?? "Failed to save. Try again.");
     } finally {
@@ -52,19 +63,18 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
   }, [isValid, loading, value, setDisplayName, updateUsername, onOpenChange]);
 
   return (
-    <Dialog open={open} onOpenChange={v => { if (!loading && !done) onOpenChange(v); }}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="border-border sm:max-w-[400px] w-[88vw] rounded-3xl overflow-hidden p-0">
         <div
           className="relative p-6"
           style={{ background: "linear-gradient(155deg, #0F0F1E 0%, #07070D 55%, #0D0A18 100%)" }}
         >
-          {/* Background glows */}
           <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full blur-3xl pointer-events-none"
             style={{ background: "rgba(226,255,0,0.10)" }} />
           <div className="absolute -bottom-8 -right-8 w-32 h-32 rounded-full blur-3xl pointer-events-none"
             style={{ background: "rgba(217,70,239,0.08)" }} />
 
-          {/* Done state */}
+          {/* Done */}
           <AnimatePresence>
             {done && (
               <motion.div
@@ -83,9 +93,13 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
                   />
                 </motion.div>
                 <p className="font-display font-black text-xl text-white uppercase">
-                  Welcome, {value}!
+                  {isChange ? "Name Updated!" : `Welcome, ${value}!`}
                 </p>
-                <p className="text-sm text-zinc-400">Your name is saved. You're on the leaderboard!</p>
+                <p className="text-sm text-zinc-400">
+                  {isChange
+                    ? `Your new name "${value}" is live on the leaderboard.`
+                    : "Your name is saved. You're on the leaderboard!"}
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -93,7 +107,6 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
           {/* Form */}
           {!done && (
             <div className="relative z-10 flex flex-col gap-5">
-              {/* Header */}
               <div className="flex flex-col items-center gap-2 text-center">
                 <motion.div
                   initial={{ scale: 0.7, opacity: 0 }}
@@ -104,16 +117,17 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
                 </motion.div>
                 <div>
                   <h2 className="font-display font-black text-2xl uppercase tracking-tight text-white">
-                    Pick Your Name
+                    {isChange ? "Change Username" : "Pick Your Name"}
                   </h2>
                   <p className="text-xs text-zinc-500 mt-1">
-                    This appears on the leaderboard — choose wisely.
+                    {isChange
+                      ? "Your new name will show on the leaderboard immediately."
+                      : "This appears on the leaderboard — choose wisely."}
                   </p>
                 </div>
               </div>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                {/* Input */}
                 <div className="relative">
                   <AtSign className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                   <Input
@@ -128,7 +142,6 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
                     autoCorrect="off"
                     spellCheck={false}
                   />
-                  {/* Character count */}
                   {value.length > 0 && (
                     <span
                       className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-mono"
@@ -139,7 +152,6 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
                   )}
                 </div>
 
-                {/* Inline validation hint */}
                 <AnimatePresence>
                   {(err || error) && (
                     <motion.p
@@ -153,7 +165,6 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
                   )}
                 </AnimatePresence>
 
-                {/* Valid indicator */}
                 <AnimatePresence>
                   {isValid && !err && (
                     <motion.div
@@ -169,33 +180,50 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
                   )}
                 </AnimatePresence>
 
-                {/* Rules */}
                 <p className="text-[10px] text-zinc-600 text-center">
                   3–20 characters · letters, numbers, underscores
                 </p>
 
-                <motion.div whileHover={{ scale: isValid ? 1.01 : 1 }} whileTap={{ scale: isValid ? 0.98 : 1 }}>
-                  <Button
-                    type="submit"
-                    disabled={!isValid || loading}
-                    className="w-full h-12 font-display font-bold text-sm uppercase rounded-2xl"
-                    style={{
-                      background: isValid ? "linear-gradient(135deg, #E2FF00, #CCE600)" : "rgba(255,255,255,0.06)",
-                      color: isValid ? "#000" : "rgba(255,255,255,0.25)",
-                      boxShadow: isValid ? "0 4px 24px rgba(226,255,0,0.4)" : "none",
-                      border: isValid ? "none" : "1px solid rgba(255,255,255,0.08)",
-                      transition: "all 0.2s ease",
-                    }}
+                <div className="flex gap-2.5">
+                  {isChange && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 h-12 rounded-2xl border-white/10 text-zinc-400"
+                      onClick={() => onOpenChange(false)}
+                      disabled={loading}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                  <motion.div
+                    className={isChange ? "flex-1" : "w-full"}
+                    whileHover={{ scale: isValid ? 1.01 : 1 }}
+                    whileTap={{ scale: isValid ? 0.98 : 1 }}
                   >
-                    {loading
-                      ? <Loader2 className="w-4 h-4 animate-spin" />
-                      : <><Sparkles className="w-4 h-4 mr-1.5" />Set My Name</>
-                    }
-                  </Button>
-                </motion.div>
+                    <Button
+                      type="submit"
+                      disabled={!isValid || loading}
+                      className="w-full h-12 font-display font-bold text-sm uppercase rounded-2xl"
+                      style={{
+                        background: isValid ? "linear-gradient(135deg, #E2FF00, #CCE600)" : "rgba(255,255,255,0.06)",
+                        color: isValid ? "#000" : "rgba(255,255,255,0.25)",
+                        boxShadow: isValid ? "0 4px 24px rgba(226,255,0,0.4)" : "none",
+                        border: isValid ? "none" : "1px solid rgba(255,255,255,0.08)",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      {loading
+                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                        : isChange
+                          ? <><Sparkles className="w-4 h-4 mr-1.5" />Save Name</>
+                          : <><Sparkles className="w-4 h-4 mr-1.5" />Set My Name</>
+                      }
+                    </Button>
+                  </motion.div>
+                </div>
               </form>
 
-              {/* Preview */}
               <AnimatePresence>
                 {isValid && (
                   <motion.div
@@ -224,8 +252,8 @@ export function UsernameSetupModal({ open, onOpenChange }: Props) {
                       <p className="text-[10px] text-zinc-500">Leaderboard preview</p>
                     </div>
                     <div className="ml-auto text-right shrink-0">
-                      <p className="font-display font-black text-sm" style={{ color: "#E2FF00" }}>0</p>
-                      <p className="text-[10px] text-zinc-600">flips</p>
+                      <p className="font-display font-black text-sm" style={{ color: "#E2FF00" }}>#{isChange ? "?" : "new"}</p>
+                      <p className="text-[10px] text-zinc-600">rank</p>
                     </div>
                   </motion.div>
                 )}
