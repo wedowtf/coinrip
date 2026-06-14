@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useContext, createContext } from "react";
+import React, { useState, useEffect, useCallback, useContext, createContext } from "react";
 import {
   User,
   signInWithEmailAndPassword,
@@ -96,10 +96,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOut(auth);
   }, []);
 
-  return (
-    <Ctx.Provider value={{ user, isLoaded, signInEmail, signUpEmail, signInGoogle, logOut, authError, clearError }}>
-      {children}
-    </Ctx.Provider>
+  return React.createElement(
+    Ctx.Provider,
+    { value: { user, isLoaded, signInEmail, signUpEmail, signInGoogle, logOut, authError, clearError } },
+    children
   );
 }
 
