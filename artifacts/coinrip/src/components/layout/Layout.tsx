@@ -35,7 +35,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-[100dvh] bg-background text-foreground pb-20 flex flex-col max-w-md mx-auto relative overflow-hidden border-x border-border shadow-2xl">
 
       {/* ─── Top Nav ─── */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-background/95 backdrop-blur z-10 sticky top-0">
+      <header className="flex items-center justify-between px-4 py-3 z-10 sticky top-0" style={{ background: 'rgba(10,10,16,0.92)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 1px 0 rgba(226,255,0,0.04), 0 4px 24px rgba(0,0,0,0.4)' }}>
         <Link href="/" className="flex items-center gap-2">
           <Logo className="w-8 h-8 sticker-shadow" />
           <span className="font-display font-black text-xl tracking-tight">CoinRip</span>
@@ -44,17 +44,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-2">
           {state.username ? (
             <Link href="/profile" className="flex items-center gap-2 active:scale-95 transition-transform">
-              <div className="flex items-center gap-2 bg-secondary/50 px-2.5 py-1.5 rounded-full border border-border">
-                <span className="font-mono text-primary font-bold text-xs">{state.coinBalance}</span>
-                <span className="text-[9px] text-muted-foreground font-bold">COINS</span>
+                  <div
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(226,255,0,0.12), rgba(226,255,0,0.05))',
+                  border: '1px solid rgba(226,255,0,0.25)',
+                  boxShadow: '0 0 14px rgba(226,255,0,0.12)',
+                }}
+              >
+                <motion.span
+                  className="font-mono font-black text-sm"
+                  style={{ color: '#E2FF00', textShadow: '0 0 8px rgba(226,255,0,0.7)' }}
+                  animate={{ textShadow: ['0 0 6px rgba(226,255,0,0.5)', '0 0 14px rgba(226,255,0,0.9)', '0 0 6px rgba(226,255,0,0.5)'] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  {state.coinBalance}
+                </motion.span>
+                <span className="text-[10px] font-black text-zinc-500">🪙</span>
               </div>
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center border-2 border-primary/40 bg-primary/15"
+              <motion.div
+                className="w-8 h-8 rounded-full flex items-center justify-center border-2 bg-primary/20"
+                style={{ borderColor: 'rgba(226,255,0,0.5)' }}
+                animate={{ boxShadow: ['0 0 0px rgba(226,255,0,0)', '0 0 10px rgba(226,255,0,0.4)', '0 0 0px rgba(226,255,0,0)'] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <span className="font-display font-black text-xs text-primary uppercase">
                   {state.username.charAt(0)}
                 </span>
-              </div>
+              </motion.div>
             </Link>
           ) : (
             <Button
@@ -75,7 +92,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* ─── Bottom Nav ─── */}
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-background/96 backdrop-blur border-t border-border flex items-center justify-around py-2 px-2 z-50">
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md flex items-center justify-around py-2 px-2 z-50" style={{ background: 'rgba(6,6,10,0.88)', backdropFilter: 'blur(24px)', borderTop: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 -4px 30px rgba(0,0,0,0.6), 0 -1px 0 rgba(226,255,0,0.05)' }}>
         {navItems.map(item => {
           const active = location === item.href;
           return (
